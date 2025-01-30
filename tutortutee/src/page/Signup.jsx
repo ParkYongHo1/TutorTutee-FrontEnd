@@ -15,21 +15,6 @@ const SignUp = () => {
     trigger,
     formState: { errors, isValid, isSubmitting },
   } = useForm();
-
-  const onSubmit = async (data) => {
-    const formData = {
-      memberId: data.memberId,
-      email: data.email,
-      password: data.password,
-    };
-    console.log(formData);
-
-    try {
-      axios.post(`${process.env.REACT_APP_BASE_URL}/member/signup`, formData);
-    } catch (error) {
-      console.log(error);
-    }
-  };
   const [isCodeMatch, setIsCodeMatch] = useState(false);
   const password = watch("password") || "";
   const confirmPassword = watch("confirmPassword") || "";
@@ -37,6 +22,25 @@ const SignUp = () => {
   const isIdMatch = id.length >= 8 && /[a-zA-Z]/.test(id) && /\d/.test(id);
   const isPasswordsMatch =
     password && confirmPassword && password === confirmPassword;
+  const [isNotIdAvailable, setIsNotIdAvailable] = useState(false);
+  const onSubmit = async (data) => {
+    const formData = {
+      memberId: data.memberId,
+      email: data.email,
+      password: data.password,
+    };
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/member/signup`,
+        formData
+      );
+    } catch (error) {
+      console.log(error);
+      if (error.response.data.message === "이미 존재하는 아이디입니다.") {
+        setIsNotIdAvailable(true);
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col justify-center items-center w-[500px] m-auto h-screen">
@@ -46,7 +50,12 @@ const SignUp = () => {
         className="max-w-full mb-[20px]"
       />
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full">
-        <IdInput register={register} id={id} isIdMatch={isIdMatch} />
+        <IdInput
+          register={register}
+          id={id}
+          isIdMatch={isIdMatch}
+          isNotIdAvailable={isNotIdAvailable}
+        />
         <EmailInput
           register={register}
           errors={errors}

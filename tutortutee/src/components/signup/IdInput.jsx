@@ -1,8 +1,4 @@
-import { useState } from "react";
-
-const IdInput = ({ register, id, isIdMatch }) => {
-  console.log(id);
-
+const IdInput = ({ register, id, isIdMatch, isNotIdAvailable }) => {
   return (
     <>
       <p className="text-start font-bold mb-[12px]">아이디</p>
@@ -22,19 +18,17 @@ const IdInput = ({ register, id, isIdMatch }) => {
         className={`${
           id === ""
             ? "border-gray-200"
-            : isIdMatch
-            ? "border-blue--500"
-            : "border-red--500"
+            : !isIdMatch || isNotIdAvailable
+            ? "border-red--500"
+            : "border-blue--500"
         } px-4 border rounded-[5px] h-[60px] mb-[12px]`}
       />
 
-      <p
-        className={`text-sm mb-[12px] text-start font-medium ${
-          !isIdMatch && id ? "text-red--500" : ""
-        }`}
-      >
+      <p className="text-sm mb-[12px] text-start font-medium text-red--500">
         {!isIdMatch && id
           ? "영문자와 숫자를 포함하여 8글자 이상 입력해주세요."
+          : isNotIdAvailable
+          ? "이미 사용중인 아이디입니다."
           : ""}
       </p>
     </>

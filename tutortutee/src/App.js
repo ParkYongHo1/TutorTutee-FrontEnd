@@ -1,21 +1,42 @@
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+import Header from "./layout/Header";
 import Main from "./page/Main";
 import Login from "./page/Login";
-import SignUp from "./page/Signup";
+import Signup from "./page/Signup";
+import Profile from "./page/Profile";
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <BrowserRouter>
+    <Router>
+      <LayoutWrapper>
         <Routes>
           <Route path="/" element={<Main />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
-      </BrowserRouter>
-    </div>
+      </LayoutWrapper>
+    </Router>
   );
-}
+};
+
+const LayoutWrapper = ({ children }) => {
+  const location = useLocation();
+
+  const hideHeader = ["/login", "/signup"].includes(location.pathname);
+
+  return (
+    <>
+      {!hideHeader && <Header />}
+      <main>{children}</main>
+    </>
+  );
+};
 
 export default App;

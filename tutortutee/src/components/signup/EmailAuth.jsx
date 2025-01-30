@@ -17,7 +17,7 @@ const EmailAuth = ({
       setConfirmEmail(true);
       const response = {
         data: {
-          success: false,
+          success: true,
         },
       };
       if (response.data.success) {
