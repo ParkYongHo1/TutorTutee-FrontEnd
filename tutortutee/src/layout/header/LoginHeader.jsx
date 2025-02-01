@@ -20,7 +20,6 @@ const LoginHeader = () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-  console.log();
 
   return (
     <div className="flex w-[1020px] h-[110px] items-center justify-between m-auto relative">

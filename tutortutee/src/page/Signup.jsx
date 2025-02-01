@@ -35,7 +35,6 @@ const SignUp = () => {
         formData
       );
     } catch (error) {
-      console.log(error);
       if (error.response.data.message === "이미 존재하는 아이디입니다.") {
         setIsNotIdAvailable(true);
       }
@@ -48,6 +47,7 @@ const SignUp = () => {
         src={`${process.env.PUBLIC_URL}/image/default/logo.png`}
         alt="로고"
         className="max-w-full mb-[20px]"
+        width={300}
       />
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full">
         <IdInput

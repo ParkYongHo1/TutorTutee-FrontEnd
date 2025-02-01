@@ -10,6 +10,7 @@ const Login = () => {
         src={`${process.env.PUBLIC_URL}/image/default/logo.png`}
         alt="로고"
         className="max-w-full mb-[50px]"
+        width={300}
       />
       <LoginInput />
       <div className="flex justify-between items-center mt-[12px] mb-[32px] w-full">
