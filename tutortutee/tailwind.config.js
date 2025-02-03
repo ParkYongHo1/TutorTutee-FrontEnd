@@ -61,6 +61,9 @@ module.exports = {
           "100%": { transform: "translateY(100%)", opacity: "0" },
         },
       },
+      boxShadow: {
+        inner: "inset 0 5px 4px rgba(0, 0, 0, 0.5)",
+      },
     },
   },
   plugins: [],

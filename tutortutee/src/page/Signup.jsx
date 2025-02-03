@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import axios from "axios";
 import PasswordInput from "../components/signup/PasswordInput";
-import SocialSignup from "../components/signup/SocialSignup";
 import IdInput from "../components/signup/IdInput";
 import EmailInput from "../components/signup/EmailInput";
 
@@ -73,7 +72,7 @@ const SignUp = () => {
         />
         <button
           type="submit"
-          className={`h-[50px] px-[24px] py-[8px] text-bold w-full rounded-[4px] text-white text-[18px] border-none ${
+          className={`h-[60px] px-[24px] py-[8px] text-bold w-full rounded-[4px] text-white text-[18px] border-none ${
             !isValid ||
             isSubmitting ||
             isCodeMatch === false ||
@@ -91,7 +90,6 @@ const SignUp = () => {
           회원가입
         </button>
       </form>
-      <SocialSignup />
     </div>
   );
 };

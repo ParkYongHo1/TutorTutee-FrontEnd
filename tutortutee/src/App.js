@@ -10,6 +10,7 @@ import Main from "./page/Main";
 import Login from "./page/Login";
 import Signup from "./page/Signup";
 import Profile from "./page/Profile";
+import FindInfo from "./page/FindInfo";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/find" element={<FindInfo />} />
         </Routes>
       </LayoutWrapper>
     </Router>
@@ -29,7 +31,7 @@ const App = () => {
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
 
-  const hideHeader = ["/login", "/signup"].includes(location.pathname);
+  const hideHeader = ["/login", "/signup", "/find"].includes(location.pathname);
 
   return (
     <>

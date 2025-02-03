@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import EmailAuth from "./EmailAuth";
-
+import { sendEmailVerification } from "../../services/userServices";
 const EmailInput = ({
   register,
   errors,
@@ -13,24 +13,15 @@ const EmailInput = ({
   const email = watch("email");
 
   const [isVisibleInput, setIsVisibleInput] = useState(false);
-  const [checkNum, setCheckNum] = useState(0);
   const [confirmEmail, setConfirmEmail] = useState(false);
   const [isEditInput, setIsEditInput] = useState(false);
   const rEmail =
     /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
 
   const handleEmailVerification = async () => {
-    console.log(email);
-
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/member/sendEmail`,
-        {
-          email: email,
-        }
-      );
-      console.log(response);
-      setCheckNum(response.data.checkNum);
+      await sendEmailVerification(email);
+      alert("해당 메일로 인증번호가 전송되었습니다.");
     } catch (error) {
       console.error(error);
     }
@@ -77,7 +68,7 @@ const EmailInput = ({
           }`}
           disabled={isCodeMatch || isVisibleInput}
         />
-        {isVisibleInput && (
+        {isVisibleInput && !isCodeMatch && (
           <button
             type="button"
             className={`w-[100px] h-[60px] absolute right-[105px] top-0 px-[20px] text-sm font-bold text-white  
@@ -94,9 +85,10 @@ const EmailInput = ({
             다시입력
           </button>
         )}
-        <button
-          type="button"
-          className={`w-[100px] h-[60px] absolute right-0 top-0 px-[20px] text-sm font-bold text-white rounded-r-[4px] 
+        {!isCodeMatch && (
+          <button
+            type="button"
+            className={`w-[100px] h-[60px] absolute right-0 top-0 px-[20px] text-sm font-bold text-white rounded-r-[4px] 
                   ${
                     errors.email
                       ? "bg-gray--200 cursor-not-allowed border border-red-500 border-l-0"
@@ -104,11 +96,12 @@ const EmailInput = ({
                       ? "bg-blue--500 border border-blue-500 border-l-0"
                       : "border-none bg-gray--200 cursor-not-allowed"
                   }`}
-          disabled={!email || !!errors.email || isCodeMatch}
-          onClick={handleButtonClick}
-        >
-          {isVisibleInput ? "재전송" : "인증하기"}
-        </button>
+            disabled={!email || !!errors.email || isCodeMatch}
+            onClick={handleButtonClick}
+          >
+            {isVisibleInput ? "재전송" : "인증하기"}
+          </button>
+        )}
       </div>
       {errors.email && (
         <p className="text-red-500 text-sm text-start mb-[12px]">
@@ -121,7 +114,6 @@ const EmailInput = ({
           setIsCodeMatch={setIsCodeMatch}
           isCodeMatch={isCodeMatch}
           watch={watch}
-          checkNum={checkNum}
           setConfirmEmail={setConfirmEmail}
         />
       )}

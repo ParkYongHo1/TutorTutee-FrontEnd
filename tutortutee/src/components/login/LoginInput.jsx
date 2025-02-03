@@ -57,7 +57,7 @@ const LoginInput = () => {
       </p>
       <button
         type="submit"
-        className="p-2 bg-blue--500 text-white rounded-[5px] h-[50px] font-bold"
+        className="p-2 bg-blue--500 text-white rounded-[5px] h-[60px] font-bold"
       >
         로그인
       </button>
