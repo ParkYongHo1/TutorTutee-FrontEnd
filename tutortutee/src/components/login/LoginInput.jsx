@@ -20,12 +20,14 @@ const LoginInput = () => {
   const onSubmit = async (data) => {
     try {
       const response = await memberLogin(data);
+
       const memberInfo = {
         memberNum: response.data.memberNum,
         nickname: response.data.nickname,
         profileImg: response.data.profileImg,
         introduction: response.data.introduction,
         hasMore: response.data.hasMore,
+        loginType: response.data.loginType,
       };
       dispatch(login({ member: memberInfo, access: response.data.access }));
       navigate("/");

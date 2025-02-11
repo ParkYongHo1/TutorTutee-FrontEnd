@@ -1,7 +1,7 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Link } from "react-router-dom";
 
-const FindSuccess = () => {
+const FindSuccess = ({ findmemberId }) => {
   return (
     <>
       <div className="relative h-[450px]">
@@ -22,7 +22,9 @@ const FindSuccess = () => {
             <hr className="w-[80%] m-auto my-[5%] border border-[2px]" />
             <div className="flex gap-[20px] w-full justify-center items-center">
               <p className="text-2xl font-bold text-blue--500">아이디</p>
-              <p className="text-2xl font-bold text-blue--500">te****34</p>
+              <p className="text-2xl font-bold text-blue--500">
+                {findmemberId}
+              </p>
             </div>
           </div>
         </div>

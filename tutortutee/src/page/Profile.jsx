@@ -1,22 +1,28 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import PostItem from "../components/profile/PostItem";
+import { useSelector } from "react-redux";
 
 const Profile = () => {
+  const member = useSelector((state) => state.member.member);
+  console.log(member.profileImg);
+
   return (
     <>
       <div className="w-[1020px] m-auto gap-[20px] flex ">
-        <div className="mb-[12px] w-[250px]">
+        <div className="mb-[12px] w-[250px] h-[250px]">
           <LazyLoadImage
-            src={`${process.env.PUBLIC_URL}/image/default/profile.svg`}
+            src={
+              member.profileImg ||
+              `${process.env.PUBLIC_URL}/image/profile/writePost.svg`
+            }
             alt="프로필"
             className="max-w-full p-1 border rounded-full mb-[24px]"
             width={250}
             height={250}
           />
-          <p className="font-bold text-xl">박용호</p>
-          <p className="text-gray--500 text-lg font-semibold ">@qkaxhf1025</p>
+          <p className="font-bold text-xl">{member.nickname}</p>
           <p className="font-thin text-xs mt-[12px] min-h-[20px]">
-            한줄 소개는 최대20글자입니다~~~!
+            {member.introduction}
           </p>
           <button className="bg-gray-200 hover:bg-gray--300 font-thin w-full my-[12px] py-2 text-sm rounded-[5px]">
             게시글 작성
@@ -24,7 +30,10 @@ const Profile = () => {
           <hr className="my-[12px]" />
           <div className="flex items-center cursor-pointer mt-[24px] mb-[16px] hover:text-blue--500">
             <LazyLoadImage
-              src={`${process.env.PUBLIC_URL}/image/profile/writePost.svg`}
+              src={
+                member.profileImg ||
+                `${process.env.PUBLIC_URL}/image/profile/writePost.svg`
+              }
               alt="게시글 아이콘"
               className="max-w-full p-1 mr-[12px]"
               width={24}

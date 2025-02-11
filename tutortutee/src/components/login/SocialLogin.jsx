@@ -1,5 +1,14 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getNaverLogin } from "../../util/getNaverLogin";
+
 const SocialLogin = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const handleNaverLogin = () => {
+    getNaverLogin(dispatch, navigate);
+  };
   return (
     <>
       <h2 className="member-sns__title flex items-center font-bold w-full">
@@ -8,7 +17,7 @@ const SocialLogin = () => {
       <div className="flex mt-[24px] gap-[60px] items-center justify-center w-full">
         <button
           className="relative w-[60px] h-[60px]"
-          //   onClick={() => openPopup()}
+          onClick={() => handleNaverLogin()}
         >
           <LazyLoadImage
             className="cursor-pointer"
@@ -31,4 +40,5 @@ const SocialLogin = () => {
     </>
   );
 };
+
 export default SocialLogin;

@@ -1,6 +1,34 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { memberLogout, refreshToken } from "../../services/userServices";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../slices/memberSlice";
 
 const HeaderAction = () => {
+  const access = useSelector((state) => state.member.access);
+  const member = useSelector((state) => state.member.member);
+
+  const dispatch = useDispatch();
+  const handleLogout = async () => {
+    try {
+      await memberLogout(access);
+      dispatch(logout());
+    } catch (error) {
+      if (
+        error?.response?.data?.message === "엑세스 토큰이 유효하지 않습니다."
+      ) {
+        const response = await refreshToken(access);
+        if (response.status === 200) {
+          await memberLogout(response.data.access);
+        }
+      } else if (
+        error?.response?.data.message === "Refresh Token이 만료되었습니다."
+      ) {
+        dispatch(logout());
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
+  };
   return (
     <>
       <div className="absolute w-[250px] z-20 border border-gray-300 bg-white shadow-lg text-start left-[-210px] top-[50px] rounded">
@@ -12,10 +40,7 @@ const HeaderAction = () => {
             width={40}
             height={40}
           />
-          <div>
-            <p className="text-xs text-black">박용호</p>
-            <p className="text-xs text-gray--500">@qkaxhf8823</p>
-          </div>
+          <p className="text-xs text-black font-bold">{member.nickname}</p>
         </div>
         <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 px-2 hover:bg-gray--100">
           <LazyLoadImage
@@ -69,7 +94,10 @@ const HeaderAction = () => {
           />
           <p className="cursor-pointer  p-2 text-xs font-medium">설정</p>
         </div>
-        <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100 mb-[12px]">
+        <div
+          onClick={() => handleLogout()}
+          className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100 mb-[12px]"
+        >
           <LazyLoadImage
             src={`${process.env.PUBLIC_URL}/image/profile/logout.svg`}
             alt="로그아웃 아이콘"
@@ -77,6 +105,7 @@ const HeaderAction = () => {
             width={24}
             height={24}
           />
+
           <p className="cursor-pointer  p-2 text-xs font-medium">로그아웃</p>
         </div>
       </div>

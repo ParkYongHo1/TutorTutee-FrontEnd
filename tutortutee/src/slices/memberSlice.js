@@ -8,6 +8,7 @@ const initialState = {
     profileImg: null,
     introduction: null,
     hasMore: false,
+    loginType: null,
   },
   access: "",
 };
@@ -30,6 +31,7 @@ const memberSlice = createSlice({
         profileImg: null,
         introduction: null,
         hasMore: null,
+        loginType: null,
       };
       state.access = "";
     },

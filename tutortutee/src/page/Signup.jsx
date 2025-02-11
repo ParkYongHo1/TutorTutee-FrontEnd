@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import axios from "axios";
 import PasswordInput from "../components/signup/PasswordInput";
 import IdInput from "../components/signup/IdInput";
 import EmailInput from "../components/signup/EmailInput";

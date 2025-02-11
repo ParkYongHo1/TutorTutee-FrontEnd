@@ -18,7 +18,20 @@ export const memberSignUp = async (data) => {
   };
   return await axios.post(`${BASE_URL}/member/signup`, formData);
 };
-
+export const memberLogout = async (access) => {
+  return await axios.post(`${BASE_URL}/member/logout`, null, {
+    headers: {
+      Authorization: `Bearer ${access}`,
+    },
+  });
+};
+export const refreshToken = async (access) => {
+  return await axios.post(`${BASE_URL}/member/tokenCheck`, null, {
+    headers: {
+      Authorization: `Bearer ${access}`,
+    },
+  });
+};
 export const findPassword = async (memberId) => {
   const formData = {
     memberId,
@@ -28,7 +41,7 @@ export const findPassword = async (memberId) => {
 
 export const findId = async (email) => {
   const formData = {
-    email,
+    email: email,
   };
   return await axios.post(`${BASE_URL}/member/findId`, formData);
 };

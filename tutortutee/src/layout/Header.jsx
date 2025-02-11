@@ -4,9 +4,6 @@ import LoginHeader from "./header/LoginHeader";
 
 const Header = () => {
   const isLoggedIn = useSelector((state) => state.member.isLoggedIn);
-  const member = useSelector((state) => state.member.member);
-  console.log(isLoggedIn);
-  console.log(member);
 
   return (
     <>

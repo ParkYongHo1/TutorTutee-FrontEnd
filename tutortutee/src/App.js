@@ -11,6 +11,7 @@ import Login from "./page/Login";
 import Signup from "./page/Signup";
 import Profile from "./page/Profile";
 import FindInfo from "./page/FindInfo";
+import ResetPassword from "./page/ResetPassword";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/find" element={<FindInfo />} />
+          <Route path="/reset" element={<ResetPassword />} />
         </Routes>
       </LayoutWrapper>
     </Router>
