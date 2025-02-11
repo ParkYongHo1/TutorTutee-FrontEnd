@@ -5,6 +5,8 @@ import axios from "axios";
 import PasswordInput from "../components/signup/PasswordInput";
 import IdInput from "../components/signup/IdInput";
 import EmailInput from "../components/signup/EmailInput";
+import { Link, useNavigate } from "react-router-dom";
+import { memberSignUp } from "../services/userServices";
 
 const SignUp = () => {
   const {
@@ -22,32 +24,31 @@ const SignUp = () => {
   const isPasswordsMatch =
     password && confirmPassword && password === confirmPassword;
   const [isNotIdAvailable, setIsNotIdAvailable] = useState(false);
+  const navigate = useNavigate();
   const onSubmit = async (data) => {
-    const formData = {
-      memberId: data.memberId,
-      email: data.email,
-      password: data.password,
-    };
     try {
-      await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/member/signup`,
-        formData
-      );
+      await memberSignUp(data);
+      alert("회원가입이 완료되었습니다.");
+      navigate("/");
     } catch (error) {
       if (error.response.data.message === "이미 존재하는 아이디입니다.") {
         setIsNotIdAvailable(true);
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
       }
     }
   };
 
   return (
-    <div className="flex flex-col justify-center items-center w-[500px] m-auto h-screen">
-      <LazyLoadImage
-        src={`${process.env.PUBLIC_URL}/image/default/logo.png`}
-        alt="로고"
-        className="max-w-full mb-[20px]"
-        width={300}
-      />
+    <div className="flex flex-col justify-center items-center w-full max-w-[500px] mx-auto my-auto min-h-screen h-auto p-1">
+      <Link to="/">
+        <LazyLoadImage
+          src={`${process.env.PUBLIC_URL}/image/default/logo.png`}
+          alt="로고"
+          className="max-w-full mb-[20px]"
+          width={300}
+        />
+      </Link>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full">
         <IdInput
           register={register}

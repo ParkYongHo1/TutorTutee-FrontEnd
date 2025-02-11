@@ -1,7 +1,7 @@
-import axios from "axios";
 import { useState } from "react";
-import EmailAuth from "./EmailAuth";
 import { sendEmailVerification } from "../../services/userServices";
+import EmailAuth from "./EmailAuth";
+
 const EmailInput = ({
   register,
   errors,
@@ -15,20 +15,24 @@ const EmailInput = ({
   const [isVisibleInput, setIsVisibleInput] = useState(false);
   const [confirmEmail, setConfirmEmail] = useState(false);
   const [isEditInput, setIsEditInput] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const rEmail =
     /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
 
   const handleEmailVerification = async () => {
     try {
       await sendEmailVerification(email);
-      alert("해당 메일로 인증번호가 전송되었습니다.");
+      setEmailError("");
     } catch (error) {
-      console.error(error);
+      if (error.response.data.message === "중복된 이메일입니다.") {
+        setEmailError("중복된 이메일입니다.");
+      }
     }
   };
 
   const handleButtonClick = () => {
     if (!isVisibleInput) {
+      alert("해당 메일로 인증번호가 전송되었습니다.");
       handleEmailVerification();
       setIsVisibleInput(true);
     } else {
@@ -42,6 +46,7 @@ const EmailInput = ({
     setIsVisibleInput(false);
     setConfirmEmail(false);
     trigger("email");
+    setEmailError("");
   };
 
   return (
@@ -71,7 +76,9 @@ const EmailInput = ({
         {isVisibleInput && !isCodeMatch && (
           <button
             type="button"
-            className={`w-[100px] h-[60px] absolute right-[105px] top-0 px-[20px] text-sm font-bold text-white  
+            className={`w-[100px] h-[60px] absolute ${
+              emailError ? "right-0 top-0" : "right-[105px] top-0"
+            }  px-[20px] text-sm font-bold text-white  
                   ${
                     errors.email
                       ? "bg-gray--200 cursor-not-allowed border border-red-500 border-l-0"
@@ -85,7 +92,7 @@ const EmailInput = ({
             다시입력
           </button>
         )}
-        {!isCodeMatch && (
+        {!isCodeMatch && !emailError && (
           <button
             type="button"
             className={`w-[100px] h-[60px] absolute right-0 top-0 px-[20px] text-sm font-bold text-white rounded-r-[4px] 
@@ -108,7 +115,12 @@ const EmailInput = ({
           {errors.email.message}
         </p>
       )}
-      {isVisibleInput && (
+      {emailError && (
+        <p className="text-red-500 text-sm text-start mb-[12px]">
+          {emailError}
+        </p>
+      )}
+      {isVisibleInput && !emailError && (
         <EmailAuth
           register={register}
           setIsCodeMatch={setIsCodeMatch}

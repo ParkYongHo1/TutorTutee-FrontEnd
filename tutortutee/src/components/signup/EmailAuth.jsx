@@ -5,23 +5,22 @@ const EmailAuth = ({
   setIsCodeMatch,
   isCodeMatch,
   watch,
-  checkNum,
   setConfirmEmail,
 }) => {
   const code = watch("emailCode") || "";
 
   const handleButtonClick = async () => {
     try {
-      const response = await axios.get(`/member/checkEmail?checkNum=${code}`);
+      await axios.get(
+        `${process.env.REACT_APP_BASE_URL}/member/checkEmail?checkNum=${code}`
+      );
       setConfirmEmail(true);
-
-      if (response.data.success) {
-        setIsCodeMatch(true);
-      } else {
+      setIsCodeMatch(true);
+    } catch (error) {
+      if (error.response.data.message === "인증번호가 다릅니다.") {
+        setConfirmEmail(true);
         setIsCodeMatch(false);
       }
-    } catch (error) {
-      console.error(error);
     }
   };
 

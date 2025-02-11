@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-
+import { memberLogin } from "../../services/userServices";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../../slices/memberSlice";
 const LoginInput = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [isUnauthorized, setIsUnauthorized] = useState(false);
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const {
     register,
     watch,
@@ -13,8 +17,28 @@ const LoginInput = () => {
     formState: { errors, isSubmitted },
   } = useForm();
   const password = watch("password");
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      const response = await memberLogin(data);
+      const memberInfo = {
+        memberNum: response.data.memberNum,
+        nickname: response.data.nickname,
+        profileImg: response.data.profileImg,
+        introduction: response.data.introduction,
+        hasMore: response.data.hasMore,
+      };
+      dispatch(login({ member: memberInfo, access: response.data.access }));
+      navigate("/");
+    } catch (error) {
+      if (
+        error.response.data.message ===
+        "아이디 또는 비밀번호가 일치하지 않습니다."
+      ) {
+        setIsUnauthorized(true);
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
   };
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-full">
@@ -52,7 +76,7 @@ const LoginInput = () => {
         {isSubmitted && (errors.memberId || errors.password)
           ? "아이디/비밀번호를 입력해주세요"
           : isUnauthorized
-          ? "일치하는 회원정보가 없습니다."
+          ? "아이디 또는 비밀번호가 일치하지 않습니다."
           : ""}
       </p>
       <button

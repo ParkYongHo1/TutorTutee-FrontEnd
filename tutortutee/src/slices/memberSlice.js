@@ -3,11 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   isLoggedIn: false,
   member: {
-    memberId: null,
+    memberNum: null,
     nickname: null,
     profileImg: null,
     introduction: null,
-    location: null,
     hasMore: false,
   },
   access: "",
@@ -26,7 +25,7 @@ const memberSlice = createSlice({
     logout(state) {
       state.isLoggedIn = false;
       state.member = {
-        memberId: null,
+        memberNum: null,
         nickname: null,
         profileImg: null,
         introduction: null,
