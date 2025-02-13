@@ -1,16 +1,18 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import PostItem from "../components/profile/PostItem";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { deleteMember } from "../services/userServices";
 import ConfirmModal from "../components/modal/ConfirmModal";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout } from "../slices/memberSlice";
 
 const Profile = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const member = useSelector((state) => state.member.member);
   const access = useSelector((state) => state.member.access);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const handleDeleteMember = async () => {
     setModalOpen(true);
   };
@@ -21,6 +23,7 @@ const Profile = () => {
       await deleteMember(access);
       alert("정상적으로 탈퇴되었습니다.");
       navigate("/");
+      dispatchEvent(logout());
     } catch (error) {
       console.log(error);
     }

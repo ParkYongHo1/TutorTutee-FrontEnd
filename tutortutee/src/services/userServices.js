@@ -19,21 +19,21 @@ export const memberSignUp = async (data) => {
   return await axios.post(`${BASE_URL}/member/signup`, formData);
 };
 export const memberLogout = async (access) => {
-  return await axios.post(`${BASE_URL}/member/logout`, null, {
+  return await axios.post(`${BASE_URL}/member/logout`, {
     headers: {
       Authorization: `Bearer ${access}`,
     },
   });
 };
 export const refreshToken = async (access) => {
-  return await axios.post(`${BASE_URL}/member/tokenCheck`, null, {
+  return await axios.post(`${BASE_URL}/member/tokenCheck`, {
     headers: {
       Authorization: `Bearer ${access}`,
     },
   });
 };
 export const deleteMember = async (access) => {
-  return await axios.delete(`${BASE_URL}/member/outMember`, null, {
+  return await axios.delete(`${BASE_URL}/member/outMember`, {
     headers: {
       Authorization: `Bearer ${access}`,
     },
