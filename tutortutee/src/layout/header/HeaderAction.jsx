@@ -2,28 +2,36 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import { memberLogout, refreshToken } from "../../services/userServices";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../slices/memberSlice";
+import { Link, useNavigate } from "react-router-dom";
 
 const HeaderAction = () => {
   const access = useSelector((state) => state.member.access);
   const member = useSelector((state) => state.member.member);
-
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = async () => {
     try {
+      console.log("logout");
+
       await memberLogout(access);
       dispatch(logout());
+      navigate("/");
     } catch (error) {
       if (
-        error?.response?.data?.message === "엑세스 토큰이 유효하지 않습니다."
+        error.response?.data?.message === "엑세스 토큰이 유효하지 않습니다."
       ) {
-        const response = await refreshToken(access);
-        if (response.status === 200) {
-          await memberLogout(response.data.access);
+        try {
+          const response = await refreshToken(access);
+          if (response.data.access) {
+            await memberLogout(response.data.access);
+          }
+        } catch (error) {
+          if (
+            error.response.data.message === "Refresh Token이 만료되었습니다."
+          ) {
+            dispatch(logout());
+          }
         }
-      } else if (
-        error?.response?.data.message === "Refresh Token이 만료되었습니다."
-      ) {
-        dispatch(logout());
       } else {
         alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
       }
@@ -33,13 +41,18 @@ const HeaderAction = () => {
     <>
       <div className="absolute w-[250px] z-20 border border-gray-300 bg-white shadow-lg text-start left-[-210px] top-[50px] rounded">
         <div className="flex items-center px-1 py-2 w-[90%] m-auto">
-          <LazyLoadImage
-            src={`${process.env.PUBLIC_URL}/image/default/profile.svg`}
-            alt="프로필"
-            className="max-w-full p-1 border rounded-full mr-2"
-            width={40}
-            height={40}
-          />
+          <div className="w-[40px] h-[40px] mr-2">
+            <LazyLoadImage
+              src={
+                member.profileImg ||
+                `${process.env.PUBLIC_URL}/image/default/profile.svg`
+              }
+              alt="프로필"
+              className={`w-full h-full object-cover fill border rounded-full`}
+              width={40}
+              height={40}
+            />
+          </div>
           <p className="text-xs text-black font-bold">{member.nickname}</p>
         </div>
         <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 px-2 hover:bg-gray--100">
@@ -53,7 +66,10 @@ const HeaderAction = () => {
           <p className="cursor-pointer  p-2 text-xs font-medium">프로필 수정</p>
         </div>
         <hr className="w-[90%] m-auto my-[12px]" />
-        <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100">
+        <Link
+          to="/profile"
+          className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100"
+        >
           <LazyLoadImage
             src={`${process.env.PUBLIC_URL}/image/profile/mypage.svg`}
             alt="마이페이지 아이콘"
@@ -62,7 +78,7 @@ const HeaderAction = () => {
             height={24}
           />
           <p className="cursor-pointer p-2 text-xs font-medium">마이페이지</p>
-        </div>
+        </Link>
         <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100">
           <LazyLoadImage
             src={`${process.env.PUBLIC_URL}/image/profile/follower.svg`}

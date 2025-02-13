@@ -1,10 +1,12 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useEffect, useState } from "react";
 import HeaderAction from "./HeaderAction";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const LoginHeader = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+  const member = useSelector((state) => state.member.member);
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
   };
@@ -23,7 +25,7 @@ const LoginHeader = () => {
 
   return (
     <div className="flex w-[1020px] h-[110px] items-center justify-between m-auto relative">
-      <div>
+      <Link to="/">
         <LazyLoadImage
           src={`${process.env.PUBLIC_URL}/image/default/logo.png`}
           alt="로고"
@@ -31,7 +33,7 @@ const LoginHeader = () => {
           width={200}
           height={50}
         />
-      </div>
+      </Link>
       <div className="flex w-[200px] gap-[30px] items-center ">
         <LazyLoadImage
           src={`${process.env.PUBLIC_URL}/image/profile/search.svg`}
@@ -54,13 +56,18 @@ const LoginHeader = () => {
           className="border rounded-full cursor-pointer ml-2 relative dropdown"
           onClick={toggleDropdown}
         >
-          <LazyLoadImage
-            src={`${process.env.PUBLIC_URL}/image/default/profile.svg`}
-            alt="프로필"
-            className="max-w-full p-1"
-            width={40}
-            height={40}
-          />
+          <div className="w-[40px] h-[40px]">
+            <LazyLoadImage
+              src={
+                member.profileImg ||
+                `${process.env.PUBLIC_URL}/image/default/profile.svg`
+              }
+              alt="프로필"
+              className={`w-full h-full object-cover fill border rounded-full`}
+              width={40}
+              height={40}
+            />
+          </div>
           {isDropdownOpen && <HeaderAction />}
         </div>
       </div>

@@ -10,7 +10,7 @@ const FindPassword = ({ register, id, isIdMatch, handleSubmit }) => {
   const onSubmit = async (data) => {
     try {
       await findPassword(data.memberId);
-      navigate("/resetPassword");
+      navigate("/reset");
     } catch (error) {
       const errorMessage = error.response?.data?.message;
       if (errorMessage === "해당하는 유저가 없습니다.") {

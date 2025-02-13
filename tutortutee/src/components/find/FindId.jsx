@@ -14,9 +14,13 @@ const FindId = ({ register, errors, trigger, watch, handleSubmit }) => {
   const onSubmit = async (data) => {
     try {
       const response = await findId(data.email);
+      console.log(response);
+
       setFindmemberId(response.data.memberId);
       setIsSuccess(true);
     } catch (error) {
+      console.log(error);
+
       const errorMessage = error.response?.data?.message;
       if (errorMessage === "해당하는 유저가 없습니다.") {
         setIsError(true);
@@ -50,7 +54,7 @@ const FindId = ({ register, errors, trigger, watch, handleSubmit }) => {
               trigger("email");
             },
           })}
-          className={`px-4 border border-gray-200 rounded-[5px] h-[60px] mb-[12px] w-full ${
+          className={`px-4 border border-gray-200 rounded-[5px] h-[60px] mb-[24px] w-full ${
             !errors.email ? "" : "border-red--500"
           }`}
         />

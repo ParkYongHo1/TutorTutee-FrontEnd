@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import FindId from "../components/find/FindId";
 import FindPassword from "../components/find/FindPassword";
 import FindTap from "../components/find/FindTap";
+import { Link } from "react-router-dom";
 
 const FindInfo = () => {
   const {
@@ -31,12 +32,14 @@ const FindInfo = () => {
 
   return (
     <div className="flex flex-col justify-center items-center w-[500px] m-auto h-screen">
-      <LazyLoadImage
-        src={`${process.env.PUBLIC_URL}/image/default/logo.png`}
-        alt="로고"
-        className="max-w-full mb-[50px]"
-        width={300}
-      />
+      <Link to="/">
+        <LazyLoadImage
+          src={`${process.env.PUBLIC_URL}/image/default/logo.png`}
+          alt="로고"
+          className="max-w-full mb-[50px]"
+          width={300}
+        />
+      </Link>
       <FindTap handleTabChange={handleTabChange} isTap={isTap} />
       {isTap === "id" ? (
         <FindId

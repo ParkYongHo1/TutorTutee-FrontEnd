@@ -32,6 +32,13 @@ export const refreshToken = async (access) => {
     },
   });
 };
+export const deleteMember = async (access) => {
+  return await axios.delete(`${BASE_URL}/member/outMember`, null, {
+    headers: {
+      Authorization: `Bearer ${access}`,
+    },
+  });
+};
 export const findPassword = async (memberId) => {
   const formData = {
     memberId,
@@ -49,4 +56,12 @@ export const findId = async (email) => {
 export const sendEmailVerification = async (email) => {
   const formData = { email };
   return await axios.post(`${BASE_URL}/member/sendEmail`, formData);
+};
+
+export const resetPassword = async (data) => {
+  const formData = {
+    memberId: data.memberId,
+    password: data.password,
+  };
+  return await axios.patch(`${BASE_URL}/member/pwdNonuser`, formData);
 };
