@@ -7,7 +7,7 @@ const Header = () => {
 
   return (
     <>
-      <div>{isLoggedIn ? <LoginHeader /> : ""};</div>
+      <div>{isLoggedIn ? <LoginHeader /> : ""}</div>
     </>
   );
 };

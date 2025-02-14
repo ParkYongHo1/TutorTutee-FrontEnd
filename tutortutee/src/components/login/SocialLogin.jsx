@@ -2,13 +2,20 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getNaverLogin } from "../../util/getNaverLogin";
+import getKakaoLogin from "../../util/getKakaoLogin";
 
 const SocialLogin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const handleNaverLogin = () => {
     getNaverLogin(dispatch, navigate);
   };
+
+  const handleKakaoLogin = () => {
+    getKakaoLogin();
+  };
+
   return (
     <>
       <h2 className="member-sns__title flex items-center font-bold w-full">
@@ -17,7 +24,7 @@ const SocialLogin = () => {
       <div className="flex mt-[24px] gap-[60px] items-center justify-center w-full">
         <button
           className="relative w-[60px] h-[60px]"
-          onClick={() => handleNaverLogin()}
+          onClick={handleNaverLogin}
         >
           <LazyLoadImage
             className="cursor-pointer"
@@ -27,7 +34,10 @@ const SocialLogin = () => {
             height={60}
           />
         </button>
-        <button className="relative w-[60px] h-[60px]">
+        <button
+          className="relative w-[60px] h-[60px]"
+          onClick={handleKakaoLogin}
+        >
           <LazyLoadImage
             className="cursor-pointer"
             src={`${process.env.PUBLIC_URL}/image/login/kakao.png`}

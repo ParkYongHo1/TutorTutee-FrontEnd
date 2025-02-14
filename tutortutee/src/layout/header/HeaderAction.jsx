@@ -11,8 +11,6 @@ const HeaderAction = () => {
   const dispatch = useDispatch();
   const handleLogout = async () => {
     try {
-      console.log("logout");
-
       await memberLogout(access);
       dispatch(logout());
       navigate("/");

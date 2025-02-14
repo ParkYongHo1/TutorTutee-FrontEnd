@@ -20,12 +20,13 @@ const Profile = () => {
   const handleConfirmDelete = async () => {
     setModalOpen(false);
     try {
-      await deleteMember(access);
+      const response = await deleteMember(access);
       alert("정상적으로 탈퇴되었습니다.");
       navigate("/");
-      dispatchEvent(logout());
+      dispatch(logout());
+      console.log(response);
     } catch (error) {
-      console.log(error);
+      alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
     }
   };
 

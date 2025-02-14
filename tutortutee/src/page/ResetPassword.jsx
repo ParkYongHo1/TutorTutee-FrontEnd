@@ -3,33 +3,27 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import PasswordInput from "../components/signup/PasswordInput";
 
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { resetPassword } from "../services/userServices";
 
 const ResetPassword = () => {
-  const {
-    register,
-    watch,
-    handleSubmit,
-    trigger,
-    formState: { errors, isValid, isSubmitting },
-  } = useForm();
+  const { register, watch, handleSubmit } = useForm();
   const password = watch("password") || "";
   const confirmPassword = watch("confirmPassword") || "";
-  const newPassword = watch("newPassword") || "";
   const memberId = watch("memberId") || "";
-  const isNewPasswordsMatch =
-    newPassword && confirmPassword && newPassword === confirmPassword;
-  const [isValidPassword, setIsVaildPassword] = useState(false);
-
+  const isPasswordsMatch =
+    password && confirmPassword && password === confirmPassword;
+  const navigate = useNavigate();
   const onSubmit = async (data) => {
     try {
       await resetPassword(data);
       alert("비밀번호가 재설정되었습니다.");
+      navigate("/");
     } catch (error) {
-      if (error.response.daa.message === "해당하는 유저가 없습니다.") {
+      if (error.response.data.message === "해당하는 유저가 없습니다.") {
         alert("해당하는 유저가 없습니다.");
-      } else if (error.response.daa.message === "기존 비밀번호와 동일합니다.") {
+      } else if (
+        error.response.data.message === "기존 비밀번호와 동일합니다."
+      ) {
         alert("기존 비밀번호와 동일합니다.");
       } else {
         alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
@@ -61,18 +55,16 @@ const ResetPassword = () => {
           password={password}
           confirmPassword={confirmPassword}
           reset={true}
-          newPassword={newPassword}
-          isNewPasswordsMatch={isNewPasswordsMatch}
-          setIsVaildPassword={setIsVaildPassword}
+          isPasswordsMatch={isPasswordsMatch}
         />
         <button
           type="submit"
           className={`h-[60px] px-[24px] py-[8px] text-bold w-full rounded-[4px] text-white text-[18px] border-none ${
-            !isValidPassword || !memberId
+            !memberId || !isPasswordsMatch
               ? "bg-gray--200 cursor-not-allowed"
               : "bg-black"
           }`}
-          disabled={!isValidPassword || !memberId}
+          disabled={!memberId || !isPasswordsMatch}
         >
           비밀번호 찾기
         </button>

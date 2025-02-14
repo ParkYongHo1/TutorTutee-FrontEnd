@@ -19,11 +19,15 @@ export const memberSignUp = async (data) => {
   return await axios.post(`${BASE_URL}/member/signup`, formData);
 };
 export const memberLogout = async (access) => {
-  return await axios.post(`${BASE_URL}/member/logout`, {
-    headers: {
-      Authorization: `Bearer ${access}`,
-    },
-  });
+  return await axios.post(
+    `${BASE_URL}/member/logout`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
 };
 export const refreshToken = async (access) => {
   return await axios.post(`${BASE_URL}/member/tokenCheck`, {
@@ -59,6 +63,8 @@ export const sendEmailVerification = async (email) => {
 };
 
 export const resetPassword = async (data) => {
+  console.log(data);
+
   const formData = {
     memberId: data.memberId,
     password: data.password,
