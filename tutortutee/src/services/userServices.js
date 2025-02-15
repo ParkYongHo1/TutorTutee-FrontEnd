@@ -63,8 +63,6 @@ export const sendEmailVerification = async (email) => {
 };
 
 export const resetPassword = async (data) => {
-  console.log(data);
-
   const formData = {
     memberId: data.memberId,
     password: data.password,

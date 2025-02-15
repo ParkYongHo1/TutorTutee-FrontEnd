@@ -15,7 +15,10 @@ const PostLike = () => {
   return (
     <>
       <div className="min-h-[30px] mt-[12px] flex gap-[12px] items-center">
-        <div className="flex gap-[8px]" onClick={handleLikeClick}>
+        <div
+          className="flex gap-[8px] cursor-pointer"
+          onClick={handleLikeClick}
+        >
           <LazyLoadImage
             src={`${
               interaction === "like"
@@ -28,7 +31,10 @@ const PostLike = () => {
           />
           <p className="text-sm">1.2천</p>
         </div>
-        <div className="flex gap-[8px]" onClick={handleDislikeClick}>
+        <div
+          className="flex gap-[8px] cursor-pointer"
+          onClick={handleDislikeClick}
+        >
           <LazyLoadImage
             src={`${
               interaction === "dislike"

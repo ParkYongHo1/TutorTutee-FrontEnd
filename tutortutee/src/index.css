@@ -23,3 +23,35 @@ input {
   flex: 1;
   border-bottom: 1px solid #babcc2;
 }
+
+textarea::-webkit-scrollbar {
+  width: 7px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background-color: #babcc2;
+  border-radius: 5px;
+}
+/* 스크롤바 스타일 */
+.scrollable {
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.scrollable::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background-color: #babcc2;
+  border-radius: 4px;
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}

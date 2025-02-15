@@ -46,6 +46,7 @@ module.exports = {
         "green--300": "#7DD8A5",
         "green--400": "#52CB87",
         "green--500": "#27BE69",
+        purple: "#970391",
       },
       animation: {
         "slide-up": "slide-up 0.5s ease-out forwards",
