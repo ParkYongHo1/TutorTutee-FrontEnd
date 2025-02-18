@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useSelector } from "react-redux";
+import useUploadImage from "../../util/getImage";
 
 const ChangeInfo = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const member = useSelector((state) => state.member.member);
+
+  const { getImage } = useUploadImage();
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
   };
@@ -28,6 +31,28 @@ const ChangeInfo = () => {
     handleSubmit,
     formState: { errors, isSubmitted },
   } = useForm();
+  const handleImageChange = async (type) => {
+    if (type === "change") {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/png,image/jpeg";
+
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          await getImage(file);
+        }
+      };
+
+      input.click();
+    } else if (type === "default") {
+      const defaultImageUrl = `${process.env.PUBLIC_URL}/image/default/profile.svg`;
+      const response = await fetch(defaultImageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], "profile.svg", { type: blob.type });
+      await getImage(file);
+    }
+  };
   return (
     <>
       <div className="text-2xl font-bold mb-[24px]">공개 프로필</div>
@@ -83,16 +108,23 @@ const ChangeInfo = () => {
                 width={50}
                 height={50}
               />
+
               {isDropdownOpen && (
                 <div className="absolute w-[200px] z-20 border border-gray-300 bg-white shadow-lg text-start left-[0px] top-[55px] rounded">
                   <div className=" px-1 py-2 w-[90%] m-auto">
-                    <div className="text-xs text-black font-bold cursor-pointer my-[12px] hover:underline">
+                    <button
+                      className="text-xs text-black font-bold cursor-pointer my-[12px] hover:underline"
+                      onClick={() => handleImageChange("change")}
+                    >
                       이미지 변경
-                    </div>
+                    </button>
                     <hr />
-                    <div className="text-xs text-black font-bold cursor-pointer my-[12px] hover:underline">
+                    <button
+                      className="text-xs text-black font-bold cursor-pointer my-[12px] hover:underline"
+                      onClick={() => handleImageChange("default")}
+                    >
                       기본이미지로 변경
-                    </div>
+                    </button>
                   </div>
                 </div>
               )}

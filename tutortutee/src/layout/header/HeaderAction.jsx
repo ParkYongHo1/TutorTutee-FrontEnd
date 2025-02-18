@@ -15,21 +15,9 @@ const HeaderAction = () => {
       dispatch(logout());
       navigate("/");
     } catch (error) {
-      if (
-        error.response?.data?.message === "엑세스 토큰이 유효하지 않습니다."
-      ) {
-        try {
-          const response = await refreshToken(access);
-          if (response.data.access) {
-            await memberLogout(response.data.access);
-          }
-        } catch (error) {
-          if (
-            error.response.data.message === "Refresh Token이 만료되었습니다."
-          ) {
-            dispatch(logout());
-          }
-        }
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate("/");
       } else {
         alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
       }

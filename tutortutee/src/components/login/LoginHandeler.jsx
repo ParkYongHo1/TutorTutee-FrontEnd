@@ -6,9 +6,10 @@ import { useDispatch } from "react-redux";
 
 const LoginHandeler = (props) => {
   const navigate = useNavigate();
-  const code = new URL(window.location.href).searchParams.get("code");
+
   const dispatch = useDispatch();
   useEffect(() => {
+    const code = new URL(window.location.href).searchParams.get("code");
     const kakaoLogin = async () => {
       try {
         const response = await axios.get(
@@ -33,10 +34,10 @@ const LoginHandeler = (props) => {
       }
     };
     kakaoLogin();
-  }, [props.history, code, dispatch, navigate]);
+  }, [props.history, dispatch, navigate]);
   return (
     <>
-      <div></div>
+      <div>로그인중입니다.</div>
     </>
   );
 };
