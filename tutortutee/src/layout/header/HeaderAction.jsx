@@ -53,7 +53,7 @@ const HeaderAction = () => {
         </div>
         <hr className="w-[90%] m-auto my-[12px]" />
         <Link
-          to="/profile"
+          to={`/profile/${member.memberNum}`}
           className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100"
         >
           <LazyLoadImage

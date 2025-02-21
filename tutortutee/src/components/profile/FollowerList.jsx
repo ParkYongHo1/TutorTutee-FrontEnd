@@ -1,6 +1,61 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { useDispatch, useSelector } from "react-redux";
+import NonFollowerList from "./NonFollowerLost";
+import { followerList } from "../../services/profileServices";
+import { logout } from "../../slices/memberSlice";
+import { useNavigate } from "react-router-dom";
+import FollowerItem from "./FollowerItem";
 
-const FollowerList = () => {
+const FollowerList = ({ memberNum, member }) => {
+  const access = useSelector((state) => state.member.access);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [observer, setObserver] = useState(0);
+  const [followers, setFollowers] = useState([]);
+
+  useEffect(() => {
+    const loadFollowerList = async () => {
+      try {
+        const response = await followerList(access, memberNum, observer);
+        setFollowers((prevFollowers) => [
+          ...prevFollowers,
+          ...response.data.followList,
+        ]);
+        console.log(response);
+      } catch (error) {
+        if (
+          error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
+        ) {
+          dispatch(logout());
+          navigate("/");
+        } else {
+          alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+        }
+      }
+    };
+
+    loadFollowerList();
+  }, [observer, access, memberNum, dispatch, navigate]);
+
+  useEffect(() => {
+    setFollowers([]);
+    setObserver(0);
+  }, [memberNum]);
+
+  const handleScroll = (event) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    if (scrollHeight - scrollTop <= clientHeight + 1) {
+      if (
+        observer === 0 ||
+        (scrollHeight - scrollTop <= clientHeight + 1 && observer > 0)
+      ) {
+        setObserver((prevObserver) => prevObserver + 1);
+      }
+    }
+  };
+
   return (
     <>
       <p className="text-sm font-bold mb-[12px]">검색</p>
@@ -22,42 +77,24 @@ const FollowerList = () => {
       </div>
       <hr />
 
-      <input type="text w-[500px] h-[50px] border" />
-      <div className="text-sm font-bold">팔로워</div>
-      <hr className="my-[12px]" />
-      <div className="flex flex-col items-center overflow-y-auto max-h-[600px] scrollable">
-        {Array.from({ length: 10 }).map((_, index) => (
-          <div key={index} className="flex mt-[12px] items-center w-full">
-            <div className="w-[100px] h-[100px]">
-              <LazyLoadImage
-                src={`${process.env.PUBLIC_URL}/image/default/profile.svg`}
-                alt="프로필"
-                className="w-full h-full object-cover fill border rounded-full mb-[24px]"
-                width={100}
-                height={100}
-              />
-            </div>
-            <div className="w-[400px] mx-[24px]">
-              <p className="text-lg font-bold">닉네임</p>
-              <p className="text-sm mt-[8px]">안녕하세요</p>
-            </div>
-            <div>
-              <button className="bg-blue-500 text-white font-bold w-[120px] h-[40px] rounded-[5px]">
-                맞팔로우
-              </button>
-            </div>
-            <div className="w-[20px] h-[20px] mx-[20px] cursor-pointer">
-              <LazyLoadImage
-                src={`${process.env.PUBLIC_URL}/image/default/cancel.svg`}
-                alt="프로필"
-                className=""
-                width={20}
-                height={20}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
+      <>
+        <div className="text-sm font-bold my-[24px]">팔로워</div>
+        <hr className="my-[12px]" />
+        <div
+          className="flex flex-col items-center overflow-y-auto w-[700px] max-h-[600px] scrollable"
+          onScroll={handleScroll}
+        >
+          {followers && followers.length > 0 ? (
+            followers.map((follower, index) => (
+              <div key={index} className="w-full">
+                <FollowerItem follower={follower} followerMemberNum={memberNum} />
+              </div>
+            ))
+          ) : (
+            <NonFollowerList />
+          )}
+        </div>
+      </>
     </>
   );
 };
