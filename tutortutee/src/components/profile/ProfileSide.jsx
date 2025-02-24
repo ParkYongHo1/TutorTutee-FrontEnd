@@ -1,13 +1,14 @@
 import { useState } from "react";
 
-import PostItem from "../../components/profile/PostItem";
-import FollowerList from "../../components/profile/FollowerList";
-import FollowingList from "../../components/profile/FollowingList";
+import PostItem from "../../components/profile/post/PostItem";
+import FollowerList from "../../components/profile/follower/FollowerList";
+import FollowingList from "./following/FollowingList";
 import ChangeInfo from "../../components/profile/ChangeInfo";
 import ProfileSideInfo from "./ProfileSideInfo";
 import ProfileSideTab from "./ProfileSideTab";
 import WritePost from "./post/WritePost";
-const ProfileSide = ({ member, memberNum, mine }) => {
+
+const ProfileSide = ({ member, memberNum, mine, setRefreshList }) => {
   const [activeComponent, setActiveComponent] = useState("posts");
 
   const renderActiveComponent = () => {
@@ -17,7 +18,7 @@ const ProfileSide = ({ member, memberNum, mine }) => {
       case "posts":
         return <PostItem />;
       case "followers":
-        return <FollowerList memberNum={memberNum} member={member} />;
+        return <FollowerList memberNum={memberNum} />;
       case "following":
         return <FollowingList />;
       case "writePost":
@@ -40,6 +41,7 @@ const ProfileSide = ({ member, memberNum, mine }) => {
           memberNum={memberNum}
           mine={mine}
           setActiveComponent={setActiveComponent}
+          setRefreshList={setRefreshList}
         />
       </div>
       <div className="w-[750px] ml-[20px] border min-h-[800px] rounded-[5px] p-6">

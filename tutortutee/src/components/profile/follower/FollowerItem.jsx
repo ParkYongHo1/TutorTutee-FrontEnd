@@ -4,25 +4,27 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   followClick,
   followerDelete,
-  followerList,
-} from "../../services/profileServices";
-import { logout } from "../../slices/memberSlice";
+  unFollow,
+} from "../../../services/profileServices";
+import { logout } from "../../../slices/memberSlice";
 import { useState } from "react";
-
-const FollowerItem = ({ follower, followerMemberNum }) => {
-  console.log(followerMemberNum);
-  const [follow, setFollow] = useState(false);
+const FollowerItem = ({
+  follower,
+  memberNum,
+  onFollow,
+  onDelete,
+  onUnFollow,
+}) => {
   const access = useSelector((state) => state.member.access);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userNum = useSelector((state) => state.member.member.memberNum);
-  const [update, setUpdate] = useState(false);
   const handleFollow = async () => {
     try {
-      await followClick(access, follower.followNickname);
-
-      alert("해당 유저를 팔로우 했습니다.");
-      setFollow(true);
+      const isFollow = await followClick(access, follower.followNickname);
+      if (isFollow) {
+        onFollow(follower);
+      }
     } catch (error) {
       if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
         dispatch(logout());
@@ -33,12 +35,12 @@ const FollowerItem = ({ follower, followerMemberNum }) => {
     }
   };
 
-  const handleFollowerDelete = async () => {
+  const handleUnFollow = async () => {
     try {
-      await followerDelete(access, followerMemberNum);
-
-      alert("해당 유저를 팔로워 리스트에서 삭제 했습니다.");
-      await followerList(access, followerMemberNum, 0);
+      const isUnFollow = await unFollow(access, follower.memberNum);
+      if (isUnFollow) {
+        onUnFollow(follower);
+      }
     } catch (error) {
       console.log(error);
 
@@ -50,6 +52,23 @@ const FollowerItem = ({ follower, followerMemberNum }) => {
       }
     }
   };
+
+  const handleFollowerDelete = async (follower) => {
+    try {
+      const isDeleted = await followerDelete(access, follower.memberNum);
+      if (isDeleted) {
+        onDelete(follower.memberNum);
+      }
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate("/");
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
+  };
+
   return (
     <div className="p-3 flex items-center justify-between mt-[12px] overflow-hidden">
       <Link
@@ -75,17 +94,27 @@ const FollowerItem = ({ follower, followerMemberNum }) => {
       </Link>
 
       <div className="flex gap-[16px]">
-        {!follower.status && (
+        {!follower.followStatus && !follower.status && (
           <button
             onClick={handleFollow}
             className="bg-blue-500 text-white font-bold w-[120px] h-[40px] rounded-[5px]"
           >
-            맞팔로우
+            {Number(memberNum) !== userNum ? "" : "맞"}팔로우
           </button>
         )}
-        {Number(followerMemberNum) === userNum && (
+        {Number(memberNum) !== userNum
+          ? ""
+          : follower.followStatus && (
+              <button
+                onClick={handleUnFollow}
+                className="bg-blue-500 text-white font-bold w-[120px] h-[40px] rounded-[5px]"
+              >
+                팔로우 취소
+              </button>
+            )}
+        {Number(memberNum) === userNum && (
           <button
-            onClick={handleFollowerDelete}
+            onClick={() => handleFollowerDelete(follower)}
             className="border bg-white text-blue--500 font-bold w-[120px] h-[40px] rounded-[5px]"
           >
             팔로워 삭제

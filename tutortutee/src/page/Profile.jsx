@@ -12,6 +12,7 @@ const Profile = () => {
   const mine = useSelector((state) => state.member.member);
   const [member, setMember] = useState({});
   const access = useSelector((state) => state.member.access);
+  const [refreshList, setRefreshList] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
@@ -19,6 +20,7 @@ const Profile = () => {
       try {
         const response = await profileInfo(access, memberNum);
         setMember(response.data);
+        console.log(response);
       } catch (error) {
         if (
           error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
@@ -31,12 +33,17 @@ const Profile = () => {
       }
     };
     loadProfileInfo();
-  }, [memberNum, access, dispatch, navigate]);
+  }, [memberNum, access, dispatch, navigate, refreshList]);
 
   return (
     <>
       <div className="w-[1020px] m-auto gap-[20px] flex ">
-        <ProfileSide member={member} memberNum={memberNum} mine={mine} />
+        <ProfileSide
+          member={member}
+          memberNum={memberNum}
+          mine={mine}
+          setRefreshList={setRefreshList}
+        />
       </div>
     </>
   );

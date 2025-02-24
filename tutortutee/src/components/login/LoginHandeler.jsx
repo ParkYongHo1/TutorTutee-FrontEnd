@@ -20,8 +20,11 @@ const LoginHandeler = (props) => {
           nickname: response.data.nickname,
           profileImg: response.data.profileImg,
           introduction: response.data.introduction,
-          hasMore: response.data.hasMore,
+          hasNotice: response.data.hasNotice,
           loginType: response.data.loginType,
+          noticeCount: response.data.noticeCount,
+          followCount: response.data.followCount,
+          followerCount: response.data.followerCount,
         };
         dispatch(login({ member: memberInfo, access: response.data.access }));
         navigate("/");

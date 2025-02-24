@@ -7,8 +7,11 @@ const initialState = {
     nickname: null,
     profileImg: null,
     introduction: null,
-    hasMore: false,
+    hasNotice: false,
     loginType: null,
+    noticeCount: 0,
+    followCount: 0,
+    followerCount: 10,
   },
   access: "",
 };
@@ -30,8 +33,11 @@ const memberSlice = createSlice({
         nickname: null,
         profileImg: null,
         introduction: null,
-        hasMore: null,
+        hasNotice: null,
         loginType: null,
+        noticeCount: null,
+        followCount: null,
+        followerCount: null,
       };
       state.access = "";
     },
@@ -44,6 +50,15 @@ const memberSlice = createSlice({
       }
       if (action.payload.introduction) {
         state.member.introduction = action.payload.introduction;
+      }
+      if (action.payload.noticeCount) {
+        state.member.noticeCount = action.payload.noticeCount;
+      }
+      if (action.payload.followCount) {
+        state.member.followCount = action.payload.followCount;
+      }
+      if (action.payload.followerCount) {
+        state.member.followerCount = action.payload.followerCount;
       }
     },
     setAccessToken(state, action) {

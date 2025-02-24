@@ -1,5 +1,6 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import ProfileSideDelete from "./ProfileSideDelete";
+import { useSelector } from "react-redux";
 
 const ProfileSideTab = ({ member, memberNum, mine, setActiveComponent }) => {
   const handleShowChangeInfo = () => setActiveComponent("changeInfo");
@@ -73,7 +74,7 @@ const ProfileSideTab = ({ member, memberNum, mine, setActiveComponent }) => {
         />
         <div className="flex w-full justify-between items-center">
           <p className="font-thin text-sm">팔로워</p>
-          <p className="font-bold">{member.followerCnt}</p>
+          <p className="font-bold">{member.followerCount}</p>
         </div>
       </div>
       <div

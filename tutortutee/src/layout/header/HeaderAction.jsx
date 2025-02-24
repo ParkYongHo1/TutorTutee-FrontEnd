@@ -41,16 +41,7 @@ const HeaderAction = () => {
           </div>
           <p className="text-xs text-black font-bold">{member.nickname}</p>
         </div>
-        <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 px-2 hover:bg-gray--100">
-          <LazyLoadImage
-            src={`${process.env.PUBLIC_URL}/image/profile/editProfile.svg`}
-            alt="프로필 수정"
-            className="max-w-full p-1"
-            width={30}
-            height={30}
-          />
-          <p className="cursor-pointer  p-2 text-xs font-medium">프로필 수정</p>
-        </div>
+
         <hr className="w-[90%] m-auto my-[12px]" />
         <Link
           to={`/profile/${member.memberNum}`}
@@ -65,26 +56,7 @@ const HeaderAction = () => {
           />
           <p className="cursor-pointer p-2 text-xs font-medium">마이페이지</p>
         </Link>
-        <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100">
-          <LazyLoadImage
-            src={`${process.env.PUBLIC_URL}/image/profile/follower.svg`}
-            alt="팔로워 아이콘"
-            className=""
-            width={24}
-            height={24}
-          />
-          <p className="cursor-pointer  p-2 text-xs font-medium">팔로워 목록</p>
-        </div>
-        <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100">
-          <LazyLoadImage
-            src={`${process.env.PUBLIC_URL}/image/profile/follow.svg`}
-            alt="팔로잉 아이콘"
-            className=" "
-            width={24}
-            height={24}
-          />
-          <p className="cursor-pointer  p-2 text-xs font-medium">팔로잉 목록</p>
-        </div>
+
         <hr className="w-[90%] m-auto my-[12px]" />
         <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100">
           <LazyLoadImage

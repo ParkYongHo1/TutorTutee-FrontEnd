@@ -1,21 +1,17 @@
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css"; // 기본 스타일
+import "react-quill/dist/quill.snow.css";
 
 const WritePost = () => {
   const [content, setContent] = useState("");
-  const maxLength = 300;
 
   const handleInputChange = (value) => {
-    if (value.length <= maxLength) {
-      setContent(value);
-    }
+    const cleanValue = value.replace(/<[^>]*>/g, "");
+    setContent(cleanValue);
   };
 
   const handleSubmit = () => {
-    // 게시글 작성 로직을 여기에 추가
     console.log("게시글 내용:", content);
-    // 예: API 호출 등
   };
 
   return (
@@ -24,34 +20,27 @@ const WritePost = () => {
       <hr className="mb-4" />
       <p className="my-4 font-semibold text-lg">공지글 내용</p>
       <ReactQuill
-        className="h-[150px]"
+        className="h-[500px]"
         value={content}
         onChange={handleInputChange}
-        placeholder="300자 이내로 작성해주세요."
+        placeholder="공지글 내용을 작성해주세요"
         modules={{
           toolbar: [
             [{ header: [1, 2, false] }],
             ["bold", "italic", "underline"],
+            ["clean"],
           ],
         }}
-      ></ReactQuill>
-
+      />
       <button
-        className="w-full bg-blue-500 text-white font-semibold py-2 rounded-md hover:bg-blue-600 transition duration-200"
+        className={`${
+          content.length < 1 ? "bg-gray-200 cursor-not-allowed" : "bg-blue-500"
+        } text-white mt-[60px] h-[60px] w-full font-semibold`}
         onClick={handleSubmit}
-        disabled={content.length === 0}
+        disabled={content.length < 1}
       >
-        게시글 작성
+        공지글 작성
       </button>
-      <div className="mt-6">
-        <h2 className="text-xl font-bold">미리보기</h2>
-        <div className="p-2 border border-gray-300 rounded-md p-2 h-[150px] overflow-y-auto">
-          <div
-            dangerouslySetInnerHTML={{ __html: content }}
-            className="prose"
-          />
-        </div>
-      </div>
     </div>
   );
 };

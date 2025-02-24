@@ -11,8 +11,7 @@ const NonFollowerList = () => {
         height={150}
       />
       <p className="text-lg font-bold text-center mt-6">
-        현재 나를 <span className="text-blue-500">팔로우</span>하고 있는 사람이
-        없습니다.
+        <span className="text-blue-500">팔로우</span>하고 있는 사람이 없습니다.
       </p>
     </div>
   );
