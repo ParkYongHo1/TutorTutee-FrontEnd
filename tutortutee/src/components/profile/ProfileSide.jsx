@@ -20,7 +20,7 @@ const ProfileSide = ({ member, memberNum, mine, setRefreshList }) => {
       case "followers":
         return <FollowerList memberNum={memberNum} />;
       case "following":
-        return <FollowingList />;
+        return <FollowingList memberNum={memberNum} />;
       case "writePost":
         return <WritePost />;
       default:

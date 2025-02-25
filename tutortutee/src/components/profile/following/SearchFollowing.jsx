@@ -5,25 +5,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../slices/memberSlice";
 import { useNavigate } from "react-router-dom";
 
-const SearchFollower = ({ memberNum, setSearchFollower, setFollowers }) => {
+const SearchFollowing = ({ memberNum, setSearchFollowing, setFollowings }) => {
   const [searchNickname, setSearchNickname] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const access = useSelector((state) => state.member.access);
   const timerRef = useRef(null);
   useEffect(() => {
-    const loadFollowerList = async () => {
+    const loadFollowingList = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/profile/searchFollower?searchName=${searchNickname}&memberNum=${memberNum}&observer=0`,
+          `${process.env.REACT_APP_BASE_URL}/profile/searchFollowing?searchName=${searchNickname}&memberNum=${memberNum}&observer=0`,
           {
             headers: {
               Authorization: `Bearer ${access}`,
             },
           }
         );
-        setSearchFollower(response.data.followList);
-        setFollowers([]);
+        setSearchFollowing(response.data.followList);
+        setFollowings([]);
       } catch (error) {
         if (
           error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
@@ -41,10 +41,10 @@ const SearchFollower = ({ memberNum, setSearchFollower, setFollowers }) => {
     }
     if (searchNickname.length > 0) {
       timerRef.current = setTimeout(() => {
-        loadFollowerList();
+        loadFollowingList();
       }, 1000);
     } else {
-      loadFollowerList();
+      loadFollowingList();
     }
 
     return () => {
@@ -56,8 +56,8 @@ const SearchFollower = ({ memberNum, setSearchFollower, setFollowers }) => {
     searchNickname,
     access,
     memberNum,
-    setSearchFollower,
-    setFollowers,
+    setSearchFollowing,
+    setFollowings,
   ]);
 
   const handleSearchChange = (event) => {
@@ -88,4 +88,4 @@ const SearchFollower = ({ memberNum, setSearchFollower, setFollowers }) => {
   );
 };
 
-export default SearchFollower;
+export default SearchFollowing;

@@ -1,6 +1,6 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
-const NonFollowerList = () => {
+const NonFollowList = () => {
   return (
     <div className="flex flex-col items-center justify-center h-screen m-auto">
       <LazyLoadImage
@@ -17,4 +17,4 @@ const NonFollowerList = () => {
   );
 };
 
-export default NonFollowerList;
+export default NonFollowList;

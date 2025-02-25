@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import NonFollowerList from "./NonFollowerLost";
 import { followerList } from "../../../services/profileServices";
 import { logout } from "../../../slices/memberSlice";
 import { useNavigate } from "react-router-dom";
 import FollowerItem from "./FollowerItem";
 import SearchFollower from "./SearchFollower";
+import NonFollowList from "../NonFollowList";
 
 const FollowerList = ({ memberNum }) => {
   const access = useSelector((state) => state.member.access);
@@ -114,7 +114,9 @@ const FollowerList = ({ memberNum }) => {
           className="flex flex-col items-center overflow-y-auto w-[700px] max-h-[600px] scrollable"
           onScroll={handleScroll}
         >
-          {searchFollower.length > 0 ? (
+          {searchFollower.length === 0 && followers.length === 0 ? (
+            <NonFollowList />
+          ) : searchFollower.length > 0 ? (
             searchFollower.map((follower, index) => (
               <div key={index} className="w-full">
                 <FollowerItem
@@ -127,7 +129,7 @@ const FollowerList = ({ memberNum }) => {
               </div>
             ))
           ) : searchFollower.length === 0 && flag ? (
-            <NonFollowerList />
+            <NonFollowList />
           ) : followers.length > 0 ? (
             followers.map((follower, index) => (
               <div key={index} className="w-full">
@@ -142,7 +144,7 @@ const FollowerList = ({ memberNum }) => {
               </div>
             ))
           ) : (
-            <NonFollowerList />
+            <NonFollowList />
           )}
         </div>
       </>

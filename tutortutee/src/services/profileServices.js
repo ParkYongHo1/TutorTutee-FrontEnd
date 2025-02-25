@@ -23,7 +23,16 @@ export const followerList = async (access, memberNum, observer) => {
     }
   );
 };
-
+export const followingList = async (access, memberNum, observer) => {
+  return await axios.get(
+    `${BASE_URL}/profile/followingList?memberNum=${memberNum}&observer=${observer}`,
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
+};
 export const followClick = async (access, followerNickName) => {
   await axios.post(
     `${BASE_URL}/profile/followClick`,
