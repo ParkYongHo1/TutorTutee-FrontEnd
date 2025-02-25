@@ -8,6 +8,7 @@ const ProfileSideTab = ({ member, memberNum, mine, setActiveComponent }) => {
   const handleShowFollowers = () => setActiveComponent("followers");
   const handleShowFollowing = () => setActiveComponent("following");
   const handleWritePost = () => setActiveComponent("writePost");
+  const user = useSelector((state) => state.member.member);
   return (
     <>
       {Number(memberNum) === mine.memberNum ? (
@@ -58,7 +59,11 @@ const ProfileSideTab = ({ member, memberNum, mine, setActiveComponent }) => {
         />
         <div className="flex w-full justify-between items-center">
           <p className="font-thin text-sm">게시글</p>
-          <p className="font-bold">{member.noticeCount}</p>
+          <p className="font-bold">
+            {Number(memberNum) === mine.memberNum
+              ? user.noticeCount
+              : member.noticeCount}
+          </p>
         </div>
       </div>
       <div
@@ -74,7 +79,11 @@ const ProfileSideTab = ({ member, memberNum, mine, setActiveComponent }) => {
         />
         <div className="flex w-full justify-between items-center">
           <p className="font-thin text-sm">팔로워</p>
-          <p className="font-bold">{member.followerCount}</p>
+          <p className="font-bold">
+            {Number(memberNum) === mine.memberNum
+              ? user.followerCount
+              : member.followerCount}
+          </p>
         </div>
       </div>
       <div
@@ -90,7 +99,11 @@ const ProfileSideTab = ({ member, memberNum, mine, setActiveComponent }) => {
         />
         <div className="flex w-full justify-between items-center">
           <p className="font-thin text-sm">팔로잉</p>
-          <p className="font-bold">{member.followCount}</p>
+          <p className="font-bold">
+            {Number(memberNum) === mine.memberNum
+              ? user.followCount
+              : member.followCount}
+          </p>
         </div>
       </div>
       {Number(memberNum) === mine.memberNum && mine.loginType === 0 ? (

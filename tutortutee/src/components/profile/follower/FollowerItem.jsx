@@ -6,8 +6,9 @@ import {
   followerDelete,
   unFollow,
 } from "../../../services/profileServices";
-import { logout } from "../../../slices/memberSlice";
+import { logout, setMemberInfoChange } from "../../../slices/memberSlice";
 import { useState } from "react";
+
 const FollowerItem = ({
   follower,
   memberNum,
@@ -19,12 +20,17 @@ const FollowerItem = ({
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const userNum = useSelector((state) => state.member.member.memberNum);
+  const followCount = useSelector((state) => state.member.member.followCount);
+  const followerCount = useSelector(
+    (state) => state.member.member.followerCount
+  );
   const handleFollow = async () => {
     try {
       const isFollow = await followClick(access, follower.followNickname);
       if (isFollow) {
         onFollow(follower);
       }
+      dispatch(setMemberInfoChange({ followCount: followCount + 1 }));
     } catch (error) {
       if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
         dispatch(logout());
@@ -41,9 +47,8 @@ const FollowerItem = ({
       if (isUnFollow) {
         onUnFollow(follower);
       }
+      dispatch(setMemberInfoChange({ followCount: followCount - 1 }));
     } catch (error) {
-      console.log(error);
-
       if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
         dispatch(logout());
         navigate("/");
@@ -59,6 +64,7 @@ const FollowerItem = ({
       if (isDeleted) {
         onDelete(follower.memberNum);
       }
+      dispatch(setMemberInfoChange({ followerCount: followerCount - 1 }));
     } catch (error) {
       if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
         dispatch(logout());

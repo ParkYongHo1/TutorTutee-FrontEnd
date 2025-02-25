@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import NonFollowerList from "./NonFollowerLost";
-import {
-  followerList,
-  followerDelete,
-} from "../../../services/profileServices"; // followerDelete 추가
+import { followerList } from "../../../services/profileServices";
 import { logout } from "../../../slices/memberSlice";
 import { useNavigate } from "react-router-dom";
 import FollowerItem from "./FollowerItem";
@@ -16,7 +13,6 @@ const FollowerList = ({ memberNum }) => {
   const navigate = useNavigate();
   const [observer, setObserver] = useState(0);
   const [followers, setFollowers] = useState([]);
-  const [refreshList, setRefreshList] = useState(false);
   const [searchFollower, setSearchFollower] = useState([]);
   const [flag, setFlag] = useState(false);
 
@@ -25,7 +21,6 @@ const FollowerList = ({ memberNum }) => {
       try {
         const response = await followerList(access, memberNum, observer);
         setFlag(response.data.flag);
-
         setFollowers((prevFollowers) => [
           ...prevFollowers,
           ...response.data.followList,
@@ -47,14 +42,7 @@ const FollowerList = ({ memberNum }) => {
     };
 
     loadFollowerList();
-  }, [observer, access, memberNum, dispatch, navigate, refreshList]);
-
-  useEffect(() => {
-    if (refreshList) {
-      setFollowers([]);
-      setRefreshList(false);
-    }
-  }, [refreshList]);
+  }, [observer, access, memberNum, dispatch, navigate]);
 
   const handleScroll = (event) => {
     const { scrollTop, scrollHeight, clientHeight } = event.target;
@@ -97,7 +85,7 @@ const FollowerList = ({ memberNum }) => {
     setFollowers((prevFollowers) =>
       prevFollowers.map((member) =>
         member.memberNum === follower.memberNum
-          ? { ...member, followStatus: false }
+          ? { ...member, followStatus: false, status: false }
           : member
       )
     );
@@ -109,15 +97,16 @@ const FollowerList = ({ memberNum }) => {
       )
     );
   };
+
   return (
     <>
       <p className="text-sm font-bold mb-[12px]">검색</p>
       <SearchFollower
         memberNum={memberNum}
         setSearchFollower={setSearchFollower}
+        setFollowers={setFollowers}
       />
       <hr />
-
       <>
         <div className="text-sm font-bold my-[24px]">팔로워</div>
         <hr className="my-[12px]" />
@@ -131,7 +120,6 @@ const FollowerList = ({ memberNum }) => {
                 <FollowerItem
                   follower={follower}
                   memberNum={memberNum}
-                  setRefreshList={setRefreshList}
                   onDelete={handleDelete}
                   onFollow={handleFollow}
                   onUnFollow={handleUnFollow}
@@ -147,7 +135,6 @@ const FollowerList = ({ memberNum }) => {
                   follower={follower}
                   memberNum={memberNum}
                   setFollowers={setFollowers}
-                  setRefreshList={setRefreshList}
                   onDelete={handleDelete}
                   onFollow={handleFollow}
                   onUnFollow={handleUnFollow}

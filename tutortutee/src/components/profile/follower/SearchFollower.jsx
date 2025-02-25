@@ -5,13 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../slices/memberSlice";
 import { useNavigate } from "react-router-dom";
 
-const SearchFollower = ({ memberNum, setSearchFollower }) => {
+const SearchFollower = ({ memberNum, setSearchFollower, setFollowers }) => {
   const [searchNickname, setSearchNickname] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const access = useSelector((state) => state.member.access);
   const timerRef = useRef(null);
-
   useEffect(() => {
     const loadFollowerList = async () => {
       try {
@@ -24,9 +23,8 @@ const SearchFollower = ({ memberNum, setSearchFollower }) => {
           }
         );
         setSearchFollower(response.data.followList);
+        setFollowers([]);
       } catch (error) {
-        console.log("searchError");
-
         if (
           error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
         ) {
