@@ -26,10 +26,6 @@ const FollowingList = ({ memberNum }) => {
           ...prevFollowings,
           ...response.data.followList,
         ]);
-        setSearchFollowing((prevFollowings) => [
-          ...prevFollowings,
-          ...response.data.followList,
-        ]);
       } catch (error) {
         if (
           error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
@@ -43,7 +39,15 @@ const FollowingList = ({ memberNum }) => {
     };
 
     loadFollowerList();
-  }, [observer, access, memberNum, dispatch, navigate]);
+  }, [
+    observer,
+    access,
+    memberNum,
+    dispatch,
+    navigate,
+    setSearchFollowing,
+    setFollowings,
+  ]);
 
   const handleScroll = (event) => {
     const { scrollTop, scrollHeight, clientHeight } = event.target;
@@ -66,8 +70,22 @@ const FollowingList = ({ memberNum }) => {
       prevFollowings.filter((member) => member.memberNum !== memberNum)
     );
   };
-  console.log(searchFollowing.length);
-
+  const handleFollow = (follower) => {
+    followings((prevFollowings) =>
+      prevFollowings.map((member) =>
+        member.memberNum === follower.memberNum
+          ? { ...member, followStatus: true }
+          : member
+      )
+    );
+    setSearchFollowing((prevFollowings) =>
+      prevFollowings.map((member) =>
+        member.memberNum === follower.memberNum
+          ? { ...member, followStatus: true }
+          : member
+      )
+    );
+  };
   return (
     <>
       <p className="text-sm font-bold mb-[12px]">검색</p>
@@ -93,11 +111,10 @@ const FollowingList = ({ memberNum }) => {
                   follower={follower}
                   memberNum={memberNum}
                   onUnFollow={handleUnFollow}
+                  onFollow={handleFollow}
                 />
               </div>
             ))
-          ) : searchFollowing.length === 0 && flag ? (
-            <NonFollowList />
           ) : followings.length > 0 ? (
             followings.map((follower, index) => (
               <div key={index} className="w-full">
@@ -106,6 +123,7 @@ const FollowingList = ({ memberNum }) => {
                   memberNum={memberNum}
                   setFollowings={setFollowings}
                   onUnFollow={handleUnFollow}
+                  onFollow={handleFollow}
                 />
               </div>
             ))

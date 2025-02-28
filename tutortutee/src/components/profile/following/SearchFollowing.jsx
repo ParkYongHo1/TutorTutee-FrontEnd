@@ -10,7 +10,6 @@ const SearchFollowing = ({ memberNum, setSearchFollowing, setFollowings }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const access = useSelector((state) => state.member.access);
-  const timerRef = useRef(null);
   useEffect(() => {
     const loadFollowingList = async () => {
       try {
@@ -22,8 +21,11 @@ const SearchFollowing = ({ memberNum, setSearchFollowing, setFollowings }) => {
             },
           }
         );
-        setSearchFollowing(response.data.followList);
-        setFollowings([]);
+        if (response.data.searchFollowList.length > 0) {
+          setSearchFollowing(response.data.searchFollowList);
+        } else {
+          setSearchFollowing([]);
+        }
       } catch (error) {
         if (
           error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
@@ -35,21 +37,7 @@ const SearchFollowing = ({ memberNum, setSearchFollowing, setFollowings }) => {
         }
       }
     };
-
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-    if (searchNickname.length > 0) {
-      timerRef.current = setTimeout(() => {
-        loadFollowingList();
-      }, 1000);
-    } else {
-      loadFollowingList();
-    }
-
-    return () => {
-      clearTimeout(timerRef.current);
-    };
+    loadFollowingList();
   }, [
     dispatch,
     navigate,

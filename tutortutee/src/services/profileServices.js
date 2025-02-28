@@ -72,3 +72,34 @@ export const followerDelete = async (access, followerMemberNum) => {
   alert("해당 유저를 팔로워 리스트에서 삭제 했습니다.");
   return true;
 };
+
+export const changeIntroduction = async (access, introduction) => {
+  await axios.patch(
+    `${BASE_URL}/profile/introduction`,
+    {
+      introduction: introduction,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
+  alert("변경되었습니다.");
+  return true;
+};
+export const changeNickname = async (access, nickname) => {
+  await axios.patch(
+    `${BASE_URL}/profile/nickname`,
+    {
+      nickname: nickname,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
+  alert("변경되었습니다.");
+  return true;
+};

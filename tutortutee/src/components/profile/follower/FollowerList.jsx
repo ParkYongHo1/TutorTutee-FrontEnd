@@ -20,12 +20,14 @@ const FollowerList = ({ memberNum }) => {
     const loadFollowerList = async () => {
       try {
         const response = await followerList(access, memberNum, observer);
+        console.log(response);
+
         setFlag(response.data.flag);
-        setFollowers((prevFollowers) => [
+        setSearchFollower((prevFollowers) => [
           ...prevFollowers,
           ...response.data.followList,
         ]);
-        setSearchFollower((prevFollowers) => [
+        setFollowers((prevFollowers) => [
           ...prevFollowers,
           ...response.data.followList,
         ]);
@@ -114,7 +116,7 @@ const FollowerList = ({ memberNum }) => {
           className="flex flex-col items-center overflow-y-auto w-[700px] max-h-[600px] scrollable"
           onScroll={handleScroll}
         >
-          {searchFollower.length === 0 && followers.length === 0 ? (
+          {searchFollower.length === 0 ? (
             <NonFollowList />
           ) : searchFollower.length > 0 ? (
             searchFollower.map((follower, index) => (
@@ -128,8 +130,6 @@ const FollowerList = ({ memberNum }) => {
                 />
               </div>
             ))
-          ) : searchFollower.length === 0 && flag ? (
-            <NonFollowList />
           ) : followers.length > 0 ? (
             followers.map((follower, index) => (
               <div key={index} className="w-full">

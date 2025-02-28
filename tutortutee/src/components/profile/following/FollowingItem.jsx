@@ -1,7 +1,7 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { unFollow } from "../../../services/profileServices";
+import { followClick, unFollow } from "../../../services/profileServices";
 import { logout, setMemberInfoChange } from "../../../slices/memberSlice";
 
 const FollowingItem = ({ follower, memberNum, onFollow, onUnFollow }) => {
@@ -27,7 +27,22 @@ const FollowingItem = ({ follower, memberNum, onFollow, onUnFollow }) => {
       }
     }
   };
-
+  const handleFollow = async () => {
+    try {
+      const isFollow = await followClick(access, follower.followNickname);
+      if (isFollow) {
+        onFollow(follower);
+      }
+      dispatch(setMemberInfoChange({ followCount: followCount + 1 }));
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate("/");
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
+  };
   return (
     <div className="p-3 flex items-center justify-between mt-[12px] overflow-hidden">
       <Link
@@ -53,6 +68,16 @@ const FollowingItem = ({ follower, memberNum, onFollow, onUnFollow }) => {
       </Link>
 
       <div className="flex gap-[16px]">
+        {!follower.followStatus &&
+          !follower.status &&
+          Number(memberNum) !== userNum && (
+            <button
+              onClick={handleFollow}
+              className="bg-blue-500 text-white font-bold w-[120px] h-[40px] rounded-[5px]"
+            >
+              {!follower.followStatus ? "" : "맞"}팔로우
+            </button>
+          )}
         {Number(memberNum) !== userNum
           ? ""
           : follower.followStatus && (

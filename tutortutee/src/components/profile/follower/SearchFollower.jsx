@@ -1,64 +1,40 @@
 import axios from "axios";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../slices/memberSlice";
 import { useNavigate } from "react-router-dom";
 
-const SearchFollower = ({ memberNum, setSearchFollower, setFollowers }) => {
+const SearchFollower = ({ memberNum, setSearchFollower }) => {
   const [searchNickname, setSearchNickname] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const access = useSelector((state) => state.member.access);
-  const timerRef = useRef(null);
-  useEffect(() => {
-    const loadFollowerList = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/profile/searchFollower?searchName=${searchNickname}&memberNum=${memberNum}&observer=0`,
-          {
-            headers: {
-              Authorization: `Bearer ${access}`,
-            },
-          }
-        );
-        setSearchFollower(response.data.followList);
-        setFollowers([]);
-      } catch (error) {
-        if (
-          error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
-        ) {
-          dispatch(logout());
-          navigate("/");
-        } else {
-          alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+
+  const loadFollowerList = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BASE_URL}/profile/searchFollower?searchName=${searchNickname}&memberNum=${memberNum}&observer=0`,
+        {
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
         }
+      );
+      if (response.data.searchFollowList.length > 0) {
+        setSearchFollower(response.data.searchFollowList);
+      } else {
+        setSearchFollower([]);
       }
-    };
-
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate("/");
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
     }
-    if (searchNickname.length > 0) {
-      timerRef.current = setTimeout(() => {
-        loadFollowerList();
-      }, 1000);
-    } else {
-      loadFollowerList();
-    }
-
-    return () => {
-      clearTimeout(timerRef.current);
-    };
-  }, [
-    dispatch,
-    navigate,
-    searchNickname,
-    access,
-    memberNum,
-    setSearchFollower,
-    setFollowers,
-  ]);
+  };
 
   const handleSearchChange = (event) => {
     setSearchNickname(event.target.value);

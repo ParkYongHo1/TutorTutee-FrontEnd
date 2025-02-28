@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useUploadImage from "../../util/getImage";
+import {
+  changeIntroduction,
+  changeNickname,
+} from "../../services/profileServices";
+import { logout, setMemberInfoChange } from "../../slices/memberSlice";
+import { useNavigate } from "react-router-dom";
 
 const ChangeInfo = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const member = useSelector((state) => state.member.member);
-
+  const access = useSelector((state) => state.member.access);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { getImage } = useUploadImage();
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -25,12 +33,9 @@ const ChangeInfo = () => {
     };
   }, []);
 
-  const {
-    register,
-    watch,
-    handleSubmit,
-    formState: { errors, isSubmitted },
-  } = useForm();
+  const { register, watch, reset } = useForm();
+  const introduction = watch("introduction") || "";
+  const nickname = watch("nickname") || "";
   const handleImageChange = async (type) => {
     if (type === "change") {
       const input = document.createElement("input");
@@ -53,6 +58,36 @@ const ChangeInfo = () => {
       await getImage(file);
     }
   };
+  const handleIntroduction = async () => {
+    try {
+      await changeIntroduction(access, introduction);
+      dispatch(setMemberInfoChange({ introduction: introduction }));
+      reset({ introduction: "" });
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate("/");
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
+  };
+  const handleNickname = async () => {
+    try {
+      await changeNickname(access, nickname);
+      dispatch(setMemberInfoChange({ nickname: nickname }));
+      reset({ nickname: "" });
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate("/");
+      } else if (error.response?.data.message === "중복된 닉네임입니다.") {
+        alert("이미 사용중인 닉네임입니다.");
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
+  };
   return (
     <>
       <div className="text-2xl font-bold mb-[24px]">공개 프로필</div>
@@ -61,28 +96,41 @@ const ChangeInfo = () => {
       <div className="flex justify-between">
         <div className="w-[100%]">
           <p className="font-bold my-[12px]">닉네임</p>
-          <form>
-            <input
-              type="text"
-              placeholder={`${member.nickname}`}
-              {...register("memberId", { required: "아이디를 입력해주세요." })}
-              className="w-[80%] px-4 border border-gray--100 rounded-[5px] h-[50px]"
-            />
-            <div className="flex gap-[12px]">
-              <button className="block h-[40px] bg-blue--500 rounded-[5px] text-white w-[100px] my-[12px] font-bold">
-                변경
-              </button>
-              <button className="block h-[40px] bg-white border rounded-[5px] text-blue--500 font-bold w-[100px] my-[12px]">
-                취소
-              </button>
-            </div>
-            <p className="text-sm my-[8px] text-gray--600">
-              - 닉네임은 한글,숫자,영어만 입력가능합니다.
-            </p>
-            <p className="text-sm my-[8px] text-gray--600">
-              - 최대 12글자 입력 가능합니다.
-            </p>
-          </form>
+          <input
+            type="text"
+            placeholder={`${member.nickname}`}
+            {...register("nickname")}
+            className="w-[80%] px-4 border border-gray--100 rounded-[5px] h-[50px]"
+          />
+          <div className="flex gap-[12px]">
+            <button
+              disabled={nickname.length === 0}
+              onClick={handleNickname}
+              className={`${
+                nickname.length === 0
+                  ? "border-none bg-gray--200 cursor-not-allowed"
+                  : "bg-blue--500 border border-blue-500"
+              } block h-[40px]  rounded-[5px] text-white w-[100px] my-[12px] font-bold`}
+            >
+              변경
+            </button>
+            <button
+              disabled={nickname.length === 0}
+              className={`${
+                nickname.length === 0
+                  ? "border-none bg-gray--200 cursor-not-allowed text-white"
+                  : "bg-white border text-blue--500 border "
+              } block h-[40px] rounded-[5px] font-bold w-[100px] my-[12px]`}
+            >
+              취소
+            </button>
+          </div>
+          <p className="text-sm my-[8px] text-gray--600">
+            - 닉네임은 한글,숫자,영어만 입력가능합니다.
+          </p>
+          <p className="text-sm my-[8px] text-gray--600">
+            - 최대 12글자 입력 가능합니다.
+          </p>
         </div>
         <div>
           <p className=" font-bold my-[12px]">프로필 사진</p>
@@ -133,25 +181,40 @@ const ChangeInfo = () => {
         </div>
       </div>
       <p className="font-bold my-[12px]">한줄소개</p>
-      <form>
-        <input
-          type="text"
-          placeholder={`${member.introduction}`}
-          {...register("memberId", { required: "아이디를 입력해주세요." })}
-          className="w-[80%] px-4 border border-gray--100 rounded-[5px] h-[50px]"
-        />
-        <div className="flex gap-[12px]">
-          <button className="block h-[40px] bg-blue--500 rounded-[5px] text-white w-[100px] my-[12px] font-bold">
-            변경
-          </button>
-          <button className="block h-[40px] bg-white border rounded-[5px] text-blue--500 font-bold w-[100px] my-[12px]">
-            취소
-          </button>
-        </div>
-        <p className="text-sm my-[8px] text-gray--600">
-          - 한줄 소개는 최대 20글자까지 입력 가능합니다.
-        </p>
-      </form>
+
+      <input
+        type="text"
+        placeholder={`${member.introduction}`}
+        {...register("introduction", { required: "내용을 입력해주세요." })}
+        maxLength={20}
+        className="w-[80%] px-4 border border-gray--100 rounded-[5px] h-[50px]"
+      />
+      <div className="flex gap-[12px]">
+        <button
+          disabled={introduction.length === 0}
+          onClick={handleIntroduction}
+          className={`${
+            introduction.length === 0
+              ? "border-none bg-gray--200 cursor-not-allowed"
+              : "bg-blue--500 border border-blue-500"
+          } block h-[40px]  rounded-[5px] text-white w-[100px] my-[12px] font-bold`}
+        >
+          변경
+        </button>
+        <button
+          disabled={introduction.length === 0}
+          className={`${
+            introduction.length === 0
+              ? "border-none bg-gray--200 cursor-not-allowed text-white"
+              : "bg-white border text-blue--500 border "
+          } block h-[40px] rounded-[5px] font-bold w-[100px] my-[12px]`}
+        >
+          취소
+        </button>
+      </div>
+      <p className="text-sm my-[8px] text-gray--600">
+        - 한줄 소개는 최대 20글자까지 입력 가능합니다.
+      </p>
       <p className="font-bold mt-[24px] mb-[12px]">계정 공개 범위</p>
       <form>
         <div className="flex items-center">
