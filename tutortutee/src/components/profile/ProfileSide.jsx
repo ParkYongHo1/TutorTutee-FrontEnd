@@ -7,16 +7,18 @@ import ChangeInfo from "../../components/profile/ChangeInfo";
 import ProfileSideInfo from "./ProfileSideInfo";
 import ProfileSideTab from "./ProfileSideTab";
 import WritePost from "./post/WritePost";
+import PostList from "./post/PostList";
 
 const ProfileSide = ({ member, memberNum, mine, setRefreshList }) => {
   const [activeComponent, setActiveComponent] = useState("posts");
+  console.log(memberNum);
 
   const renderActiveComponent = () => {
     switch (activeComponent) {
       case "changeInfo":
         return <ChangeInfo />;
       case "posts":
-        return <PostItem />;
+        return <PostList memberNum={memberNum} />;
       case "followers":
         return <FollowerList memberNum={memberNum} />;
       case "following":

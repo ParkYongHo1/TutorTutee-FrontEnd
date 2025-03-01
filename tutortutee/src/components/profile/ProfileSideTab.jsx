@@ -9,7 +9,6 @@ const ProfileSideTab = ({ member, memberNum, mine, setActiveComponent }) => {
   const handleShowFollowing = () => setActiveComponent("following");
   const handleWritePost = () => setActiveComponent("writePost");
   const user = useSelector((state) => state.member.member);
-  console.log(user);
 
   return (
     <>

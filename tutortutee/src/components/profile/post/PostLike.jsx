@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 
-const PostLike = () => {
+const PostLike = ({ notice }) => {
   const [interaction, setInteraction] = useState("none");
 
   const handleLikeClick = () => {
@@ -29,7 +29,7 @@ const PostLike = () => {
             width={20}
             height={20}
           />
-          <p className="text-sm">1.2천</p>
+          <p className="text-sm">{notice.likeCount}</p>
         </div>
         <div
           className="flex gap-[8px] cursor-pointer"
@@ -45,7 +45,7 @@ const PostLike = () => {
             width={20}
             height={20}
           />
-          <p className="text-sm">999</p>
+          <p className="text-sm">{notice.disLikeCount}</p>
         </div>
       </div>
     </>

@@ -1,17 +1,34 @@
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, setMemberInfoChange } from "../../../slices/memberSlice";
+import { useNavigate } from "react-router-dom";
+import { writeNotice } from "../../../services/profileServices";
 
 const WritePost = () => {
   const [content, setContent] = useState("");
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const access = useSelector((state) => state.member.access);
+  const noticeCount = useSelector((state) => state.member.member.noticeCount);
   const handleInputChange = (value) => {
-    const cleanValue = value.replace(/<[^>]*>/g, "");
-    setContent(cleanValue);
+    setContent(value);
   };
 
-  const handleSubmit = () => {
-    console.log("게시글 내용:", content);
+  const handleSubmit = async () => {
+    try {
+      await writeNotice(access, content);
+      setContent("");
+      dispatch(setMemberInfoChange({ noticeCount: noticeCount + 1 }));
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate(`/`);
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
   };
 
   return (

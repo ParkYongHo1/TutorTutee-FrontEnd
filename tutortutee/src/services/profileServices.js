@@ -103,3 +103,43 @@ export const changeNickname = async (access, nickname) => {
   alert("변경되었습니다.");
   return true;
 };
+
+export const writeNotice = async (access, noticeContent) => {
+  await axios.post(
+    `${BASE_URL}/profile/writeNotice`,
+    {
+      noticeContent: noticeContent,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
+  alert("게시글이 등록되었습니다.");
+  return true;
+};
+
+export const loadNoticeList = async (access, memberNum, observer) => {
+  return await axios.get(
+    `${BASE_URL}/profile/myNotice?memberNum=${memberNum}&observer=${observer}`,
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
+};
+
+export const noticeDelete = async (access, noticeNum) => {
+  await axios.delete(
+    `${BASE_URL}/profile/deleteNotice?noticeNum=${noticeNum}`,
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
+  alert("해당 공지글을 삭제했습니다.");
+  return true;
+};
