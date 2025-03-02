@@ -120,14 +120,9 @@ export const writeNotice = async (access, noticeContent) => {
   return true;
 };
 
-export const loadNoticeList = async (access, memberNum, observer) => {
+export const loadNoticeList = async (memberNum, observer) => {
   return await axios.get(
-    `${BASE_URL}/profile/myNotice?memberNum=${memberNum}&observer=${observer}`,
-    {
-      headers: {
-        Authorization: `Bearer ${access}`,
-      },
-    }
+    `${BASE_URL}/profile/notice?memberNum=${memberNum}&observer=${observer}`
   );
 };
 
@@ -142,4 +137,15 @@ export const noticeDelete = async (access, noticeNum) => {
   );
   alert("해당 공지글을 삭제했습니다.");
   return true;
+};
+
+export const lastNotice = async (access, observer) => {
+  return await axios.get(
+    `${BASE_URL}/profile/lastNotice?observer=${observer}`,
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
 };

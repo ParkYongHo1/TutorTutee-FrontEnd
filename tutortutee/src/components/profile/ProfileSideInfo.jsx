@@ -6,13 +6,15 @@ const ProfileSideInfo = ({ member, memberNum, mine, setActiveComponent }) => {
   useEffect(() => {
     setActiveComponent("posts");
   }, [setActiveComponent, memberNum]);
+
   return (
     <>
       <div className="w-[250px] h-[250px]">
         <LazyLoadImage
           src={
             Number(memberNum) === mine.memberNum
-              ? mine.profileImg
+              ? mine.profileImg ||
+                `${process.env.PUBLIC_URL}/image/default/profile.svg`
               : member.profileImg ||
                 `${process.env.PUBLIC_URL}/image/default/profile.svg`
           }

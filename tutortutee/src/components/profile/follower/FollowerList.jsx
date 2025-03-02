@@ -20,7 +20,6 @@ const FollowerList = ({ memberNum }) => {
     const loadFollowerList = async () => {
       try {
         const response = await followerList(access, memberNum, observer);
-        console.log(response);
 
         setFlag(response.data.flag);
         setSearchFollower((prevFollowers) => [

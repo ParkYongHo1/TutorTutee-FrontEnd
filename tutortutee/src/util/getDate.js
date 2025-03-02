@@ -13,7 +13,7 @@ function formatDate(noticeDate) {
   const hours = String(noticeTime.getHours()).padStart(2, "0");
   const minutes = String(noticeTime.getMinutes()).padStart(2, "0");
 
-  return `${year}-${month}-${day} ${hours}:${minutes}`;
+  return `${year}.${month}.${day} ${hours}:${minutes}`;
 }
 
 export default formatDate;
