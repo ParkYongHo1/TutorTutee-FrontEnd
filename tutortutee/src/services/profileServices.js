@@ -149,3 +149,33 @@ export const lastNotice = async (access, observer) => {
     }
   );
 };
+
+export const likeNotice = async (access, noticeNum) => {
+  await axios.patch(
+    `${BASE_URL}/profile/likeNotice`,
+    {
+      noticeNum: noticeNum,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
+  return true;
+};
+
+export const disLikeNotice = async (access, noticeNum) => {
+  await axios.patch(
+    `${BASE_URL}/profile/disLikeNotice`,
+    {
+      noticeNum: noticeNum,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
+  return true;
+};
