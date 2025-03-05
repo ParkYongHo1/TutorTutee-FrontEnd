@@ -56,6 +56,44 @@ const PostList = ({ memberNum }) => {
       prevNotices.filter((notice) => notice.noticeNum !== noticeNum)
     );
   };
+  const handleLikeClick = (noticeNum) => {
+    setNotices((prevNotices) =>
+      prevNotices.map((notice) =>
+        notice.noticeNum === noticeNum
+          ? notice.likeStatus
+            ? {
+                ...notice,
+                likeCount: notice.likeCount - 1,
+                likeStatus: false,
+              }
+            : {
+                ...notice,
+                likeCount: notice.likeCount + 1,
+                likeStatus: true,
+              }
+          : notice
+      )
+    );
+  };
+  const handleDisLikeClick = (noticeNum) => {
+    setNotices((prevNotices) =>
+      prevNotices.map((notice) =>
+        notice.noticeNum === noticeNum
+          ? notice.disLikeStatus
+            ? {
+                ...notice,
+                disLikeCount: notice.disLikeCount - 1,
+                disLikeStatus: false,
+              }
+            : {
+                ...notice,
+                disLikeCount: notice.disLikeCount + 1,
+                disLikeStatus: true,
+              }
+          : notice
+      )
+    );
+  };
   const handleWidthScroll = (event) => {
     const { scrollLeft, scrollWidth, clientWidth } = event.target;
     if (scrollWidth - scrollLeft <= clientWidth + 1) {
@@ -135,7 +173,10 @@ const PostList = ({ memberNum }) => {
                   ...notice,
                   noticeContent: sanitizeHtml(notice.noticeContent),
                 }}
+                setNotices={setNotices}
                 onDelete={handleDelete}
+                onLikeClick={handleLikeClick}
+                onDisLikeClick={handleDisLikeClick}
               />
             </div>
           ))

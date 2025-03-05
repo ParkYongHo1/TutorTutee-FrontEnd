@@ -1,15 +1,41 @@
 import { useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { disLikeNotice, likeNotice } from "../../../services/profileServices";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../../slices/memberSlice";
 
-const PostLike = ({ notice }) => {
-  const [interaction, setInteraction] = useState("none");
+const PostLike = ({ notice, onLikeClick, onDisLikeClick }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const access = useSelector((state) => state.member.access);
 
-  const handleLikeClick = () => {
-    setInteraction((prev) => (prev === "like" ? "none" : "like"));
+  const handleLikeClick = async () => {
+    try {
+      await likeNotice(access, notice.noticeNum);
+      onLikeClick(notice.noticeNum);
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate(`/`);
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
   };
 
-  const handleDislikeClick = () => {
-    setInteraction((prev) => (prev === "dislike" ? "none" : "dislike"));
+  const handleDislikeClick = async () => {
+    try {
+      await disLikeNotice(access, notice.noticeNum);
+      onDisLikeClick(notice.noticeNum);
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate(`/`);
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
   };
 
   return (
@@ -21,7 +47,7 @@ const PostLike = ({ notice }) => {
         >
           <LazyLoadImage
             src={`${
-              interaction === "like"
+              notice.likeStatus
                 ? `${process.env.PUBLIC_URL}/image/profile/checkLike.svg`
                 : `${process.env.PUBLIC_URL}/image/profile/like.svg`
             }`}
@@ -37,7 +63,7 @@ const PostLike = ({ notice }) => {
         >
           <LazyLoadImage
             src={`${
-              interaction === "dislike"
+              notice.disLikeStatus
                 ? `${process.env.PUBLIC_URL}/image/profile/checkDisLike.svg`
                 : `${process.env.PUBLIC_URL}/image/profile/disLike.svg`
             }`}
