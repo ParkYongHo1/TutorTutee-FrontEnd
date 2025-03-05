@@ -13,6 +13,7 @@ import Signup from "./page/Signup";
 import Profile from "./page/Profile";
 import FindInfo from "./page/FindInfo";
 import ResetPassword from "./page/ResetPassword";
+import Search from "./page/Search";
 import { useSelector } from "react-redux";
 import LoginHandeler from "./components/login/LoginHandeler";
 import WritePost from "./components/profile/post/WritePost";
@@ -37,6 +38,7 @@ const App = () => {
             path="/oauth2/authorization/kakao"
             element={<LoginHandeler />}
           />
+          <Route path="/search" element={<Search />} />
         </Routes>
       </LayoutWrapper>
     </Router>
@@ -46,7 +48,7 @@ const App = () => {
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
 
-  const hideHeader = ["/login", "/signup", "/find"].includes(location.pathname);
+  const hideHeader = ["/login", "/signup", "/find", "/search"].includes(location.pathname);
 
   return (
     <>
