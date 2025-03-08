@@ -23,6 +23,7 @@ const SearchFollowing = ({ memberNum, setSearchFollowing, setFollowings }) => {
         );
         if (response.data.searchFollowList.length > 0) {
           setSearchFollowing(response.data.searchFollowList);
+          setFollowings([]);
         } else {
           setSearchFollowing([]);
         }

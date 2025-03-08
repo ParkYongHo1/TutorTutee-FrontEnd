@@ -16,30 +16,36 @@ import ResetPassword from "./page/ResetPassword";
 import { useSelector } from "react-redux";
 import LoginHandeler from "./components/login/LoginHandeler";
 import WritePost from "./components/profile/post/WritePost";
+import Floating from "./layout/Alarm/FloatingButton";
+import Test from "./page/Test";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.member.isLoggedIn);
   return (
-    <Router>
-      <LayoutWrapper>
-        <Routes>
-          <Route path="/" element={<Main />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/profile/:memberNum"
-            element={isLoggedIn ? <Profile /> : <Navigate to="/login" />}
-          />
-          <Route path="/writePost" element={<WritePost />} />
-          <Route path="/find" element={<FindInfo />} />
-          <Route path="/reset" element={<ResetPassword />} />
-          <Route
-            path="/oauth2/authorization/kakao"
-            element={<LoginHandeler />}
-          />
-        </Routes>
-      </LayoutWrapper>
-    </Router>
+    <>
+      {isLoggedIn && <Floating />}
+      <Router>
+        <LayoutWrapper>
+          <Routes>
+            <Route path="/" element={<Main />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route
+              path="/profile/:memberNum"
+              element={isLoggedIn ? <Profile /> : <Navigate to="/login" />}
+            />
+            <Route path="/writePost" element={<WritePost />} />
+            <Route path="/find" element={<FindInfo />} />
+            <Route path="/reset" element={<ResetPassword />} />
+            <Route
+              path="/oauth2/authorization/kakao"
+              element={<LoginHandeler />}
+            />
+            <Route path="/test" element={<Test />} />
+          </Routes>
+        </LayoutWrapper>
+      </Router>
+    </>
   );
 };
 

@@ -60,6 +60,9 @@ const memberSlice = createSlice({
       if (action.payload.followerCount) {
         state.member.followerCount = action.payload.followerCount;
       }
+      if (action.payload.hasNotice) {
+        state.member.hasNotice = action.payload.hasNotice;
+      }
     },
     setAccessToken(state, action) {
       state.access = action.payload.access;

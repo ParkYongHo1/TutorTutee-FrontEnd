@@ -99,16 +99,14 @@ const FollowerItem = ({
       </Link>
 
       <div className="flex gap-[16px]">
-        {!follower.followStatus &&
-          !follower.status &&
-          Number(memberNum) !== userNum && (
-            <button
-              onClick={handleFollow}
-              className="bg-blue-500 text-white font-bold w-[120px] h-[40px] rounded-[5px]"
-            >
-              {Number(memberNum) !== userNum ? "" : "맞"}팔로우
-            </button>
-          )}
+        {!follower.followStatus && !follower.status && (
+          <button
+            onClick={handleFollow}
+            className="bg-blue-500 text-white font-bold w-[120px] h-[40px] rounded-[5px]"
+          >
+            {Number(memberNum) !== userNum ? "" : "맞"}팔로우
+          </button>
+        )}
         {Number(memberNum) !== userNum
           ? ""
           : follower.followStatus && (
