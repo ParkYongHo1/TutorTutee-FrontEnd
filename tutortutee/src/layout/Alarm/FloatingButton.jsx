@@ -96,6 +96,7 @@ export default function Floating() {
     };
   }, [isPopupVisible]);
   console.log(hasNotice);
+  console.log(isLoggedIn);
 
   return (
     <>

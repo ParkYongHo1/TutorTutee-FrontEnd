@@ -24,6 +24,7 @@ const App = () => {
   const isLoggedIn = useSelector((state) => state.member.isLoggedIn);
   return (
     <Router>
+      {isLoggedIn ? <Floating /> : ""}
       <LayoutWrapper>
         <Routes>
           <Route path="/" element={<Main />} />
