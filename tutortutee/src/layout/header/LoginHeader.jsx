@@ -35,13 +35,15 @@ const LoginHeader = () => {
         />
       </Link>
       <div className="flex w-[200px] gap-[30px] items-center ">
-        <LazyLoadImage
-          src={`${process.env.PUBLIC_URL}/image/profile/search.svg`}
-          alt="검색"
-          className="max-w-full cursor-pointer"
-          width={30}
-          height={30}
-        />
+        <Link to="/search">
+          <LazyLoadImage
+            src={`${process.env.PUBLIC_URL}/image/profile/search.svg`}
+            alt="검색"
+            className="max-w-full cursor-pointer"
+            width={30}
+            height={30}
+          />
+        </Link>
         <div className="cursor-pointer flex items-center">
           <LazyLoadImage
             src={`${process.env.PUBLIC_URL}/image/profile/video.svg`}

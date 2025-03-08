@@ -13,6 +13,7 @@ import Signup from "./page/Signup";
 import Profile from "./page/Profile";
 import FindInfo from "./page/FindInfo";
 import ResetPassword from "./page/ResetPassword";
+import Search from "./page/Search";
 import { useSelector } from "react-redux";
 import LoginHandeler from "./components/login/LoginHandeler";
 import WritePost from "./components/profile/post/WritePost";
@@ -22,37 +23,36 @@ import Test from "./page/Test";
 const App = () => {
   const isLoggedIn = useSelector((state) => state.member.isLoggedIn);
   return (
-    <>
-      {isLoggedIn && <Floating />}
-      <Router>
-        <LayoutWrapper>
-          <Routes>
-            <Route path="/" element={<Main />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route
-              path="/profile/:memberNum"
-              element={isLoggedIn ? <Profile /> : <Navigate to="/login" />}
-            />
-            <Route path="/writePost" element={<WritePost />} />
-            <Route path="/find" element={<FindInfo />} />
-            <Route path="/reset" element={<ResetPassword />} />
-            <Route
-              path="/oauth2/authorization/kakao"
-              element={<LoginHandeler />}
-            />
-            <Route path="/test" element={<Test />} />
-          </Routes>
-        </LayoutWrapper>
-      </Router>
-    </>
+    <Router>
+      <LayoutWrapper>
+        <Routes>
+          <Route path="/" element={<Main />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/profile/:memberNum"
+            element={isLoggedIn ? <Profile /> : <Navigate to="/login" />}
+          />
+          <Route path="/writePost" element={<WritePost />} />
+          <Route path="/find" element={<FindInfo />} />
+          <Route path="/reset" element={<ResetPassword />} />
+          <Route
+            path="/oauth2/authorization/kakao"
+            element={<LoginHandeler />}
+          />
+          <Route path="/search" element={<Search />} />
+        </Routes>
+      </LayoutWrapper>
+    </Router>
   );
 };
 
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
 
-  const hideHeader = ["/login", "/signup", "/find"].includes(location.pathname);
+  const hideHeader = ["/login", "/signup", "/find", "/search"].includes(
+    location.pathname
+  );
 
   return (
     <>

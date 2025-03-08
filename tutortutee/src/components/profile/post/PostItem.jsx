@@ -5,7 +5,7 @@ import PostLike from "./PostLike";
 import { useSelector } from "react-redux";
 import formatDate from "../../../util/getDate";
 import DOMPurify from "dompurify";
-const PostItem = ({ notice, onDelete }) => {
+const PostItem = ({ notice, onDelete, onLikeClick, onDisLikeClick }) => {
   const member = useSelector((state) => state.member.member);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -64,7 +64,11 @@ const PostItem = ({ notice, onDelete }) => {
             __html: DOMPurify.sanitize(notice.noticeContent),
           }}
         />
-        <PostLike notice={notice} />
+        <PostLike
+          notice={notice}
+          onLikeClick={onLikeClick}
+          onDisLikeClick={onDisLikeClick}
+        />
       </div>
     </>
   );
