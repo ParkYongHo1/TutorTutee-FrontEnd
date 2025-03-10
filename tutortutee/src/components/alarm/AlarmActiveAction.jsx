@@ -2,35 +2,28 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import ConfirmModal from "../modal/ConfirmModal";
 import { useState } from "react";
-import { setMemberInfoChange } from "../../slices/memberSlice";
+import { logout, setMemberInfoChange } from "../../slices/memberSlice";
+import { useNavigate } from "react-router-dom";
+import { alarmDeleteAll } from "../../services/alarmServices";
 
-const AlarmActiveAction = ({
-  setActiveTab,
-  activeTab,
-  setIsDelete,
-  setHasNotification,
-}) => {
+const AlarmActiveAction = ({ setActiveTab, activeTab, onDeleteAll }) => {
+  const navigate = useNavigate();
   const access = useSelector((state) => state.member.access);
-  const [isModalOpen, setModalOpen] = useState(false);
   const dispatch = useDispatch();
   const handleAlarmDelete = async () => {
-    setModalOpen(false);
     try {
-      await axios.delete(`${process.env.REACT_APP_BASE_URL}/alim/deleteAll`, {
-        headers: {
-          Authorization: `Bearer ${access}`,
-        },
-      });
-      alert("정상적으로 삭제되었습니다.");
-      setIsDelete(true);
-      dispatch(setMemberInfoChange({ hasNotice: false }));
+      await alarmDeleteAll(access);
+      onDeleteAll();
     } catch (error) {
-      console.log(error);
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate("/");
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
     }
   };
-  const handleCancelDelete = () => {
-    setModalOpen(false);
-  };
+
   return (
     <>
       <div className="flex items-center justify-between text-xs py-4 w-[380px] m-auto">
@@ -46,39 +39,48 @@ const AlarmActiveAction = ({
 
           <div className="after:content-['|']"></div>
           <div
-            onClick={() => setActiveTab("chat")}
+            onClick={() => setActiveTab("TYPE_FOLLOW")}
             className={`cursor-pointer ${
-              activeTab === "chat" ? "text-black" : ""
+              activeTab === "TYPE_FOLLOW" ? "text-black" : ""
             } hover:text-black`}
           >
-            채팅
+            팔로우
           </div>
           <div className="after:content-['|']"></div>
           <div
-            onClick={() => setActiveTab("comment")}
+            onClick={() => setActiveTab("TYPE_LECTURE")}
             className={`cursor-pointer ${
-              activeTab === "comment" ? "text-black" : ""
+              activeTab === "TYPE_LECTURE" ? "text-black" : ""
             } hover:text-black`}
           >
-            댓글
+            LIVE
           </div>
           <div className="after:content-['|']"></div>
           <div
-            onClick={() => setActiveTab("reply")}
+            onClick={() => setActiveTab("TYPE_LIKE")}
             className={`cursor-pointer ${
-              activeTab === "reply" ? "text-black" : ""
+              activeTab === "TYPE_LIKE" ? "text-black" : ""
             } hover:text-black`}
           >
-            답글
+            좋아요
           </div>
           <div className="after:content-['|']"></div>
           <div
-            onClick={() => setActiveTab("commerce")}
+            onClick={() => setActiveTab("TYPE_DISLIKE")}
             className={`cursor-pointer ${
-              activeTab === "commerce" ? "text-black" : ""
+              activeTab === "TYPE_DISLIKE" ? "text-black" : ""
             } hover:text-black`}
           >
-            공동구매
+            싫어요
+          </div>
+          <div className="after:content-['|']"></div>
+          <div
+            onClick={() => setActiveTab("TYPE_NOTICE")}
+            className={`cursor-pointer ${
+              activeTab === "TYPE_NOTICE" ? "text-black" : ""
+            } hover:text-black`}
+          >
+            공지
           </div>
         </div>
         <div
@@ -88,12 +90,6 @@ const AlarmActiveAction = ({
           전체삭제
         </div>
       </div>
-      <ConfirmModal
-        isOpen={isModalOpen}
-        onConfirm={handleAlarmDelete}
-        onCancel={handleCancelDelete}
-        message="정말 삭제하시겠습니까? 삭제된 알림은 복구가 불가능합니다."
-      />
     </>
   );
 };

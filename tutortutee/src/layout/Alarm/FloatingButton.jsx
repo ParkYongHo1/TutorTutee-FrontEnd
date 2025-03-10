@@ -1,56 +1,38 @@
-// import floating from "/public/image/floating.svg";
-// import { useCallback, useEffect, useRef, useState } from "react";
-// import { useSelector } from "react-redux";
-// import { usePathname } from "next/navigation";
-// import AlarmHeader from "../_alarm/AlarmHeader";
-// import AlarmActiveAction from "../_alarm/AlarmActiveAction";
-// import AlarmInfo from "../_alarm/AlarmInfo";
-// import alarmIcon from "/public/image/alarm/alarm.svg";
-// import useFetchAlarms from "@/app/hooks/useFetchAlarms";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useSSE from "../../hooks/useSSE";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import AlarmHeader from "../../components/alarm/AlarmHeader";
 import AlarmActiveAction from "../../components/alarm/AlarmActiveAction";
 import AlarmInfo from "../../components/alarm/AlarmInfo";
-import { setMemberInfoChange } from "../../slices/memberSlice";
-
+import { logout } from "../../slices/memberSlice";
+import { alarmList } from "../../services/alarmServices";
+import { useNavigate } from "react-router-dom";
 export default function Floating() {
   const [alarms, setAlarms] = useState([]);
   const access = useSelector((state) => state.member.access);
   const isLoggedIn = useSelector((state) => state.member.isLoggedIn);
-  const hasNotice = useSelector((state) => state.member.member.hasNotice);
   const dispatch = useDispatch();
   const popupRef = useRef(null);
-  const [hasNotification, setHasNotification] = useState(true);
+  const [hasNotification, setHasNotification] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [isDelete, setIsDelete] = useState(false);
   const [activeTab, setActiveTab] = useState("전체");
+  const [observer, setObserver] = useState(0);
+  const [flag, setFlag] = useState(false);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchAlarm = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/alim/list?observer=0`,
-          {
-            headers: {
-              Authorization: `Bearer ${access}`,
-            },
-          }
-        );
-        setAlarms((prev) => [...prev, ...response.data.alimList]);
-      } catch (error) {
-        console.log(error);
+  const createEventSource = useCallback((data) => {
+    if (!data.read) {
+      {
+        setHasNotification(true);
       }
-    };
-    fetchAlarm();
-  }, [access, dispatch]);
-  useSSE(setAlarms, hasNotice);
+    }
+  }, []);
 
-  const handlePopup = async () => {
+  useSSE(createEventSource);
+
+  const handlePopup = () => {
     if (isPopupVisible) {
       setIsAnimating(true);
       setTimeout(() => {
@@ -60,19 +42,6 @@ export default function Floating() {
     } else {
       setHasNotification(false);
       setIsPopupVisible(true);
-
-      try {
-        await axios.get(
-          `${process.env.REACT_APP_BASE_URL}/alim/send?memberNum=33`,
-          {
-            headers: {
-              Authorization: `Bearer ${access}`,
-            },
-          }
-        );
-      } catch (error) {
-        console.log(error);
-      }
     }
   };
 
@@ -81,8 +50,6 @@ export default function Floating() {
       setIsPopupVisible(false);
     }
   };
-
-  useEffect(() => {}, [isPopupVisible, isDelete]);
 
   useEffect(() => {
     if (isPopupVisible) {
@@ -95,8 +62,50 @@ export default function Floating() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isPopupVisible]);
-  console.log(hasNotice);
-  console.log(isLoggedIn);
+  useEffect(() => {
+    const loadMore = async () => {
+      try {
+        const response = await alarmList(access, observer);
+        setFlag(response.data.flag);
+        setAlarms((prev) => [...prev, ...response.data.alimList]);
+      } catch (error) {
+        if (
+          error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
+        ) {
+          dispatch(logout());
+          navigate("/");
+        } else {
+          alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+        }
+      }
+    };
+    loadMore();
+  }, [access, observer, dispatch, navigate]);
+
+  const handleScroll = (event) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    if (scrollHeight - scrollTop <= clientHeight + 1) {
+      if (
+        !flag &&
+        (observer === 0 ||
+          (scrollHeight - scrollTop <= clientHeight + 1 && observer > 0))
+      ) {
+        setObserver((prevObserver) => prevObserver + 1);
+      }
+    }
+  };
+
+  const handleDelete = (alarmNum) => {
+    setAlarms((prev) => prev.filter((alarm) => alarm.alimNum !== alarmNum));
+  };
+  const handleDeleteAll = () => {
+    setAlarms([]);
+  };
+  const filteredAlarms = alarms.filter((alarm) => {
+    if (activeTab === "전체") return true;
+
+    return alarm.alimType === activeTab;
+  });
 
   return (
     <>
@@ -114,7 +123,7 @@ export default function Floating() {
                 height={40}
                 alt="Floating Button"
               />
-              {hasNotice && (
+              {hasNotification && (
                 <div className="absolute top-0 right-0 w-5 h-5 bg-red-500 rounded-full border border-white"></div>
               )}
             </div>
@@ -132,11 +141,13 @@ export default function Floating() {
                 <AlarmActiveAction
                   setActiveTab={setActiveTab}
                   activeTab={activeTab}
-                  setHasNotification={setHasNotification}
-                  setIsDelete={setIsDelete}
+                  onDeleteAll={handleDeleteAll}
                 />
-                <div className="scrollable max-h-[600px] min-h-[600px] overflow-y-auto">
-                  {alarms.length === 0 ? (
+                <div
+                  onScroll={handleScroll}
+                  className="scrollable max-h-[600px] min-h-[600px] overflow-y-auto"
+                >
+                  {filteredAlarms.length === 0 ? (
                     <div className="mx-auto my-auto flex flex-col justify-center items-center">
                       <LazyLoadImage
                         src={`${process.env.PUBLIC_URL}/image/alarm/alarm.svg`}
@@ -152,8 +163,12 @@ export default function Floating() {
                       다양한 알림을 이곳에서 모아볼 수 있어요.
                     </div>
                   ) : (
-                    alarms.map((alarm, index) => (
-                      <AlarmInfo key={index} alarm={alarm} />
+                    filteredAlarms.map((alarm, index) => (
+                      <AlarmInfo
+                        key={index}
+                        alarm={alarm}
+                        onDelete={handleDelete}
+                      />
                     ))
                   )}
                 </div>

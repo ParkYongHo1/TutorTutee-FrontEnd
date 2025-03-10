@@ -7,7 +7,7 @@ const initialState = {
     nickname: null,
     profileImg: null,
     introduction: null,
-    hasNotice: false,
+    hasAlim: null,
     loginType: null,
     noticeCount: 0,
     followCount: 0,
@@ -33,7 +33,7 @@ const memberSlice = createSlice({
         nickname: null,
         profileImg: null,
         introduction: null,
-        hasNotice: null,
+        hasAlim: null,
         loginType: null,
         noticeCount: null,
         followCount: null,
@@ -60,8 +60,8 @@ const memberSlice = createSlice({
       if (action.payload.followerCount) {
         state.member.followerCount = action.payload.followerCount;
       }
-      if (action.payload.hasNotice) {
-        state.member.hasNotice = action.payload.hasNotice;
+      if (action.payload.hasAlim) {
+        state.member.hasAlim = action.payload.hasAlim;
       }
     },
     setAccessToken(state, action) {

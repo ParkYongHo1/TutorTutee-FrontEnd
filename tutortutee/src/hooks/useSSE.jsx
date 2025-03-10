@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { EventSourcePolyfill } from "event-source-polyfill";
-const useSSE = ({ setAlarms }) => {
+const useSSE = (onMessage) => {
   const eventSourceRef = useRef(null);
   const isLoggedIn = useSelector((state) => state.member.isLoggedIn);
   const memberNum = useSelector((state) => state.member.member.memberNum);
@@ -14,32 +13,18 @@ const useSSE = ({ setAlarms }) => {
     }
 
     const createEventSource = () => {
-      const source = new EventSourcePolyfill(
-        `${process.env.REACT_APP_BASE_URL}/alim/subscribe?memberNum=${memberNum}`,
-        {
-          headers: {
-            Authorization: `Bearer ${access}`,
-          },
-        }
+      const source = new EventSource(
+        `${process.env.REACT_APP_BASE_URL}/alim/subscribe?memberNum=${memberNum}`
       );
-      console.log(source);
-
-      source.onopen = () => {
-        console.log("EventSource connection opened.");
-      };
 
       source.onmessage = (event) => {
-        console.log(event.data);
-
         const data = JSON.parse(event.data);
-        setAlarms(data);
+        onMessage(data);
       };
 
       source.onerror = () => {
         source.close();
         eventSourceRef.current = null;
-        console.log("error");
-
         if (reconnectAttempts.current < 5) {
           reconnectAttempts.current += 1;
           setTimeout(createEventSource, 2000);
@@ -58,7 +43,7 @@ const useSSE = ({ setAlarms }) => {
         eventSourceRef.current = null;
       }
     };
-  }, [access, isLoggedIn, memberNum, eventSourceRef, setAlarms]);
+  }, [access, isLoggedIn, memberNum, eventSourceRef, onMessage]);
 };
 
 export default useSSE;

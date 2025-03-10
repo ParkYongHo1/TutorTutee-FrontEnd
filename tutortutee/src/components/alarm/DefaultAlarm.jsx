@@ -1,15 +1,47 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import formatDate from "../../util/getDate";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import { ALARM_TYPE, ALARM_TYPE_MESSAGE } from "../../util/constant";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../slices/memberSlice";
+import { alarmDelete } from "../../services/alarmServices";
 
-export default function DefaultAlarm({ alarm, alarmLink }) {
+export default function DefaultAlarm({ alarm, onDelete }) {
+  const dispatch = useDispatch();
+  const access = useSelector((state) => state.member.access);
+  const navigate = useNavigate();
+  const handleDelete = async () => {
+    try {
+      const isDelete = await alarmDelete(access, alarm.alimNum);
+      if (isDelete) {
+        onDelete(alarm.alimNum);
+      }
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate("/");
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
+  };
   return (
-    <div className={`w-[380px] min-h-[120px] m-auto mb-3`}>
-      <div className={`bg-white p-4 rounded-lg shadow-md w-full`}>
-        <div className="flex items-center  text-xs justify-between mb-2">
-          <div>
-            {alarm.alimType === "TYPE_FOLLOW" ? "팔로우" : alarm.writer}
+    <div className={`w-[380px] min-h-[120px] m-auto mb-3 cursor-pointer`}>
+      <div
+        className={`${
+          alarm.read ? "bg-gray--100" : "bg-white"
+        }  p-4 rounded-lg shadow-md w-full `}
+      >
+        <div className="flex items-center  text-xs justify-between mb-2 ">
+          <div
+            className={`flex justify-between items-center ${
+              alarm.read ? "text-gray--500" : "text-blue--500"
+            }`}
+          >
+            {Object.keys(ALARM_TYPE).find(
+              (key) => ALARM_TYPE[key] === alarm.alimType
+            )}
           </div>
           <div>
             <LazyLoadImage
@@ -18,38 +50,40 @@ export default function DefaultAlarm({ alarm, alarmLink }) {
               className="w-full h-full object-cover fill cursor-pointer"
               width={100}
               height={100}
+              onClick={handleDelete}
             />
           </div>
         </div>
         <div>
-          <div className="flex justify-between">
-            <div className="flex">
-              {alarm.type === "commerce_success" ||
-              alarm.type === "commerce_fail" ? (
-                <>
-                  의&nbsp;<span className="text-blue--500"> 공동구매</span>
-                  가&nbsp;
-                  {alarm.type === "commerce_success" ? (
-                    <>
-                      <span className="text-blue--500 font-bold">성공</span>
-                      했습니다.
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-red--500 font-bold">실패</span>
-                      했습니다.
-                    </>
-                  )}
-                </>
-              ) : (
-                <>{alarm.alimMsg}</>
-              )}
+          <div
+            className={`flex justify-between items-center ${
+              alarm.read ? "text-gray--100" : "text-white"
+            }}`}
+          >
+            <div className="flex ">
+              <p
+                className={`font-bold ${
+                  alarm.read ? "text-gray--500" : "text-blue--500"
+                }`}
+              >
+                {alarm.alimMsg}
+              </p>
+              <span
+                className={`${alarm.read ? "text-gray--500" : "text-black"}`}
+              >
+                님이 &nbsp;
+                {Object.keys(ALARM_TYPE_MESSAGE).find(
+                  (key) => ALARM_TYPE_MESSAGE[key] === alarm.alimType
+                )}
+              </span>
             </div>
           </div>
-
-          <div className="text-sm mt-[4px] font-semibold">
+          <div
+            className={`text-sm mt-[4px] font-semibold ${
+              alarm.read ? "text-gray--500" : "text-black"
+            }`}
+          >
             {formatDate(alarm.sendTime)}
-            {alarm.alimNum}
           </div>
         </div>
       </div>

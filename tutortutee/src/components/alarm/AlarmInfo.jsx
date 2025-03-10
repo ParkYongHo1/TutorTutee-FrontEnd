@@ -1,11 +1,15 @@
 import axios from "axios";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import DefaultAlarm from "./DefaultAlarm";
 import { useEffect } from "react";
+import { logout, setMemberInfoChange } from "../../slices/memberSlice";
+import { useNavigate } from "react-router-dom";
 
-const AlarmInfo = ({ alarm }) => {
+const AlarmInfo = ({ alarm, onDelete }) => {
   const access = useSelector((state) => state.member.access);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   useEffect(() => {
     const handleLinkClick = async () => {
       try {
@@ -19,24 +23,29 @@ const AlarmInfo = ({ alarm }) => {
           }
         );
       } catch (error) {
-        console.log(error);
+        if (
+          error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
+        ) {
+          dispatch(logout());
+          navigate("/");
+        } else {
+          alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+        }
       }
     };
     handleLinkClick();
-  }, []);
+  }, [access, dispatch, navigate]);
 
   const alarmLink =
-    alarm.type === "comment" || alarm.type === "reply"
-      ? `/community/1`
-      : alarm.type === "commerce"
-      ? "/mypage/myorder"
-      : alarm.type === "chat"
-      ? `/chat/2`
+    alarm.alimType === "TYPE_NOTICE"
+      ? `/profile/${alarm.memberNum}`
+      : alarm.alimType === "TYPE_LECTURE"
+      ? `/live/${alarm.memberNum}`
       : "";
 
   return (
     <>
-      <DefaultAlarm alarm={alarm} alarmLink={alarmLink} />
+      <DefaultAlarm alarm={alarm} onDelete={onDelete} />
     </>
   );
 };
