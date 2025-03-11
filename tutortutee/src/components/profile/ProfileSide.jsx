@@ -11,7 +11,6 @@ import PostList from "./post/PostList";
 
 const ProfileSide = ({ member, memberNum, mine, setRefreshList }) => {
   const [activeComponent, setActiveComponent] = useState("posts");
-  console.log(memberNum);
 
   const renderActiveComponent = () => {
     switch (activeComponent) {
