@@ -12,6 +12,11 @@ const PostLike = ({ notice, onLikeClick, onDisLikeClick }) => {
 
   const handleLikeClick = async () => {
     try {
+      if (notice.disLikeStatus) {
+        await disLikeNotice(access, notice.noticeNum);
+        onDisLikeClick(notice.noticeNum);
+      }
+
       await likeNotice(access, notice.noticeNum);
       onLikeClick(notice.noticeNum);
     } catch (error) {
@@ -26,6 +31,10 @@ const PostLike = ({ notice, onLikeClick, onDisLikeClick }) => {
 
   const handleDislikeClick = async () => {
     try {
+      if (notice.likeStatus) {
+        await likeNotice(access, notice.noticeNum);
+        onLikeClick(notice.noticeNum);
+      }
       await disLikeNotice(access, notice.noticeNum);
       onDisLikeClick(notice.noticeNum);
     } catch (error) {
