@@ -1,7 +1,22 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-const SearchUser = () => {
+const SearchUser = ({ memberNum, setSearchNickname }) => {
+  const [nickname, setNickname] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const access = useSelector((state) => state.member.access);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setNickname(value);
+    setSearchNickname(value);
+  };
+
   return (
     <div className="flex w-[1020px] h-[110px] items-center justify-between m-auto relative">
       <Link to="/">
@@ -18,6 +33,8 @@ const SearchUser = () => {
           type="text"
           placeholder="닉네임을 입력해주세요."
           className="w-full px-5 h-[50px] bg-gray-500/10 rounded-lg"
+          value={nickname}
+          onChange={handleSearchChange}
         />
         <LazyLoadImage
           src={`${process.env.PUBLIC_URL}/image/profile/search.svg`}
