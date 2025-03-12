@@ -8,6 +8,7 @@ import AlarmInfo from "../../components/alarm/AlarmInfo";
 import { logout } from "../../slices/memberSlice";
 import { alarmList } from "../../services/alarmServices";
 import { useNavigate } from "react-router-dom";
+import AlarmModal from "../../components/modal/AlarmModal";
 export default function Floating() {
   const [alarms, setAlarms] = useState([]);
   const access = useSelector((state) => state.member.access);
@@ -16,15 +17,18 @@ export default function Floating() {
   const popupRef = useRef(null);
   const [hasNotification, setHasNotification] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [activeTab, setActiveTab] = useState("전체");
   const [observer, setObserver] = useState(0);
   const [flag, setFlag] = useState(false);
   const navigate = useNavigate();
-
+  const [newAlarm, setNewAlarm] = useState({});
   const createEventSource = useCallback((data) => {
     if (!data.read) {
       {
+        setIsModalOpen(true);
+        setNewAlarm(data);
         setHasNotification(true);
       }
     }
@@ -106,6 +110,9 @@ export default function Floating() {
 
     return alarm.alimType === activeTab;
   });
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
 
   return (
     <>
@@ -177,6 +184,15 @@ export default function Floating() {
           )}
         </>
       )}
+      <div>
+        {isModalOpen && (
+          <AlarmModal
+            isOpen={isModalOpen}
+            onConfirm={handleModalClose}
+            alarm={newAlarm}
+          />
+        )}
+      </div>
     </>
   );
 }
