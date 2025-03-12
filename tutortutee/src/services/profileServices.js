@@ -179,3 +179,11 @@ export const disLikeNotice = async (access, noticeNum) => {
   );
   return true;
 };
+
+export const searchList = async (access, nickname) => {
+  return await axios.get(`${BASE_URL}/search?nickname=${nickname}`, {
+    headers: {
+      Authorization: `Bearer ${access}`,
+    },
+  });
+};
