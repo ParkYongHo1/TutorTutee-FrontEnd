@@ -1,90 +1,41 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { searchList } from "../../services/profileServices";
+import { followingList } from "../../services/profileServices";
+import { logout } from "../../slices/memberSlice";
 import SearchUser from "./SearchUser";
 import SearchUserItem from "./SearchUserItem";
-import { searchList } from "../../services/profileServices";
 import NonSearchList from "./NonSearchList";
 
-const SearchUserList = ({ memberNum }) => {
+const SearchUserList = () => {
   const access = useSelector((state) => state.member.access);
+  const memberNum = useSelector((state) => state.member.member.memberNum);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [searchUser, setSearchUser] = useState([]);
   const [searchNickname, setSearchNickname] = useState("");
+
+  const [observer, setObserver] = useState(0);
+  const [followings, setFollowings] = useState([]);
   const [flag, setFlag] = useState(false);
-  const [isFirstLoad, setIsFirstLoad] = useState(true); // 🔹 처음 로드인지 체크
 
-  // 🔹 뒤로 가기 시 기존 검색 상태 유지
   useEffect(() => {
-    const navigationType =
-      window.performance.getEntriesByType("navigation")[0]?.type;
-
-    if (navigationType === "reload" || navigationType === "navigate") {
-      // 🔹 새로고침 또는 처음 방문 시 검색 초기화
-      sessionStorage.removeItem("searchNickname");
-      sessionStorage.removeItem("searchUser");
-      sessionStorage.removeItem("flag");
-      setSearchNickname("");
+    if (searchNickname.trim() === "") {
       setSearchUser([]);
-      setFlag(false);
-    } else {
-      // 🔹 뒤로 가기 시 검색 상태 유지
-      const savedSearchNickname = sessionStorage.getItem("searchNickname");
-      const savedSearchUser = sessionStorage.getItem("searchUser");
-      const savedFlag = sessionStorage.getItem("flag");
-
-      if (savedSearchNickname) setSearchNickname(savedSearchNickname);
-      if (savedSearchUser) setSearchUser(JSON.parse(savedSearchUser));
-      if (savedFlag) setFlag(JSON.parse(savedFlag));
-
-      setIsFirstLoad(false); // 🔹 처음 로드가 끝났음을 표시
-    }
-  }, []);
-
-  // 🔹 검색어 변경 시 검색 결과 저장
-  useEffect(() => {
-    if (searchNickname.trim() !== "") {
-      sessionStorage.setItem("searchNickname", searchNickname);
-    }
-  }, [searchNickname]);
-
-  // 🔹 검색 결과 변경 시 sessionStorage 저장
-  useEffect(() => {
-    if (searchUser.length > 0) {
-      sessionStorage.setItem("searchUser", JSON.stringify(searchUser));
-    }
-  }, [searchUser]);
-
-  // 🔹 flag 변경 시 sessionStorage 저장
-  useEffect(() => {
-    sessionStorage.setItem("flag", JSON.stringify(flag));
-  }, [flag]);
-
-  // 🔹 검색어가 변경되었을 때만 API 요청 실행
-  useEffect(() => {
-    if (searchNickname.trim() === "" || isFirstLoad) {
-      setIsFirstLoad(false); // 🔹 API 요청 방지 후 초기화
       return;
     }
 
     const loadSearchUserList = async () => {
       try {
         const response = await searchList(access, searchNickname);
-
-        setFlag(response.data.flag);
         setSearchUser(response.data.memberList);
-
-        // 🔹 검색 결과 sessionStorage에 저장
-        sessionStorage.setItem("searchNickname", searchNickname);
-        sessionStorage.setItem(
-          "searchUser",
-          JSON.stringify(response.data.memberList)
-        );
-        sessionStorage.setItem("flag", JSON.stringify(response.data.flag));
       } catch (error) {
         if (
           error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
         ) {
+          dispatch(logout());
           navigate("/");
         } else {
           alert("오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
@@ -93,23 +44,90 @@ const SearchUserList = ({ memberNum }) => {
     };
 
     loadSearchUserList();
-  }, [searchNickname, access, navigate, isFirstLoad]);
+  }, [searchNickname, access, navigate, dispatch]);
+
+  useEffect(() => {
+    const loadFollowerList = async () => {
+      try {
+        const response = await followingList(access, memberNum, observer);
+        setFlag(response.data.flag);
+
+        setFollowings((prevFollowings) => [
+          ...prevFollowings,
+          ...response.data.followList,
+        ]);
+      } catch (error) {
+        if (
+          error.response?.data?.message === "리프레시 토큰이 만료되었습니다."
+        ) {
+          dispatch(logout());
+          navigate("/");
+        } else {
+          alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+        }
+      }
+    };
+
+    loadFollowerList();
+  }, [observer, access, memberNum, dispatch, navigate, setFollowings]);
+
+  const updatedSearchUserList = searchUser.map((user) => ({
+    ...user,
+    followStatus: followings.some(
+      (following) => following.memberNum === user.memberNum
+    ),
+  }));
+
+  const handleScroll = (event) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.target;
+    if (scrollHeight - scrollTop <= clientHeight + 1) {
+      if (
+        !flag &&
+        (observer === 0 ||
+          (scrollHeight - scrollTop <= clientHeight + 1 && observer > 0))
+      ) {
+        setObserver((prevObserver) => prevObserver + 1);
+      }
+    }
+  };
+
+  const handleFollow = (follower) => {
+    setFollowings((prevFollowings) => [
+      ...prevFollowings,
+      { ...follower, followStatus: true },
+    ]);
+  };
+
+  const handleUnFollow = (memberNum) => {
+    setFollowings((prevFollowings) =>
+      prevFollowings.filter((member) => member.memberNum !== memberNum)
+    );
+  };
 
   return (
     <>
-      <SearchUser memberNum={memberNum} setSearchNickname={setSearchNickname} />
-      <div className="mx-auto max-w-[1020px] grid grid-cols-3 gap-10 place-items-center p-5 overflow-y-auto max-h-[600px] scrollable">
+      <SearchUser setSearchNickname={setSearchNickname} />
+      <div
+        className="mx-auto w-[1020px] min-h-[80vh] mb-[30px] 
+        grid grid-cols-3 gap-10 py-[50px] px-10 overflow-y-auto scrollable
+        border border-gray-200 rounded-md shadow-md"
+        onScroll={handleScroll}
+      >
         {searchUser.length === 0 ? (
-          <div className="col-span-3">
+          <div className="col-span-3 flex items-center justify-center h-full">
             <NonSearchList searchNickname={searchNickname} />
           </div>
         ) : (
-          searchUser.map((user, index) => (
-            <SearchUserItem
-              key={index}
-              searchUser={user}
-              memberNum={memberNum}
-            />
+          updatedSearchUserList.map((user, index) => (
+            <div key={index} className="flex justify-center">
+              <SearchUserItem
+                searchUser={user}
+                memberNum={memberNum}
+                onUnFollow={handleUnFollow}
+                onFollow={handleFollow}
+                followings={followings}
+              />
+            </div>
           ))
         )}
       </div>

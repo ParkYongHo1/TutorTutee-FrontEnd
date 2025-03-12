@@ -1,15 +1,9 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
 
-const SearchUser = ({ memberNum, setSearchNickname }) => {
+const SearchUser = ({ setSearchNickname }) => {
   const [nickname, setNickname] = useState("");
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const access = useSelector((state) => state.member.access);
 
   const handleSearchChange = (e) => {
     const value = e.target.value;

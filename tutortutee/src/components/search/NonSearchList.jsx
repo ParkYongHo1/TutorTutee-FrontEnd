@@ -2,7 +2,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 
 const NonSearchList = ({ searchNickname }) => {
   return (
-    <div className="flex flex-col items-center justify-center mt-[30px]">
+    <div className="flex flex-col items-center justify-center">
       {searchNickname.trim() !== "" ? (
         <>
           <LazyLoadImage
