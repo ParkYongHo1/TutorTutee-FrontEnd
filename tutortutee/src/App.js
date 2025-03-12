@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 import LoginHandeler from "./components/login/LoginHandeler";
 import WritePost from "./components/profile/post/WritePost";
 import Floating from "./layout/Alarm/FloatingButton";
-import Test from "./page/Test";
+import Live from "./page/Live";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.member.isLoggedIn);
@@ -42,6 +42,7 @@ const App = () => {
             element={<LoginHandeler />}
           />
           <Route path="/search" element={<Search />} />
+          <Route path="/live" element={<Live />} />
         </Routes>
       </LayoutWrapper>
     </Router>
@@ -51,9 +52,13 @@ const App = () => {
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
 
-  const hideHeader = ["/login", "/signup", "/find", "/search"].includes(
-    location.pathname
-  );
+  const hideHeader = [
+    "/login",
+    "/signup",
+    "/find",
+    "/search",
+    "/live",
+  ].includes(location.pathname);
 
   return (
     <>

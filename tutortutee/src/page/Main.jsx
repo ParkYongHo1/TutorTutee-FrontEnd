@@ -58,6 +58,9 @@ const Main = () => {
       <Link to="/login">로그인바로가기</Link>
       <Link to="/signup">회원가입바로가기</Link>
       <Link to="/find">아이디 비밀번호 찾기 바로가기</Link>
+      <Link to="/live" target="_blank">
+        라이브 새 창 열기
+      </Link>
     </div>
   );
 };
