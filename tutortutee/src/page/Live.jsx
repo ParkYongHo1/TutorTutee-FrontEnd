@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import LiveCam from "../components/live/liveCam/LiveCam";
 import LiveChat from "../components/live/liveChat/LiveChat";
-import LiveHeader from "../layout/header/LiveHeader";
 
 const Live = () => {
   const { roomId } = useParams();
@@ -9,7 +8,7 @@ const Live = () => {
     <div className=" w-[1700px] m-auto ">
       <div className="flex items-center">
         <LiveCam />
-        <LiveChat />
+        <LiveChat roomId={roomId} />
       </div>
     </div>
   );
