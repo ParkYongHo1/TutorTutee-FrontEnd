@@ -120,9 +120,14 @@ export const writeNotice = async (access, noticeContent) => {
   return true;
 };
 
-export const loadNoticeList = async (memberNum, observer) => {
+export const loadNoticeList = async (access, memberNum, observer) => {
   return await axios.get(
-    `${BASE_URL}/profile/notice?memberNum=${memberNum}&observer=${observer}`
+    `${BASE_URL}/profile/notice?memberNum=${memberNum}&observer=${observer}`,
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
   );
 };
 

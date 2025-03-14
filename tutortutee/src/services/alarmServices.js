@@ -29,3 +29,17 @@ export const alarmDeleteAll = async (access) => {
   alert("정상적으로 삭제되었습니다.");
   return true;
 };
+
+export const alarmSend = async (access, participantList) => {
+  return await axios.post(
+    `${process.env.REACT_APP_BASE_URL}/room/create`,
+    {
+      participantList: participantList,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${access}`,
+      },
+    }
+  );
+};

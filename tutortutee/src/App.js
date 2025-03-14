@@ -22,6 +22,7 @@ import Live from "./page/Live";
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.member.isLoggedIn);
+
   return (
     <Router>
       {isLoggedIn ? <Floating /> : ""}
@@ -42,7 +43,7 @@ const App = () => {
             element={<LoginHandeler />}
           />
           <Route path="/search" element={<Search />} />
-          <Route path="/live" element={<Live />} />
+          <Route path="/live/:roomId" element={<Live />} />
         </Routes>
       </LayoutWrapper>
     </Router>
@@ -52,13 +53,10 @@ const App = () => {
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
 
-  const hideHeader = [
-    "/login",
-    "/signup",
-    "/find",
-    "/search",
-    "/live",
-  ].includes(location.pathname);
+  const hideHeader =
+    ["/login", "/signup", "/find", "/search", "/live"].includes(
+      location.pathname
+    ) || /^\/live\/.*/.test(location.pathname);
 
   return (
     <>
