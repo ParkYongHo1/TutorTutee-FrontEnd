@@ -1,56 +1,122 @@
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { ALARM_TYPE_MESSAGE } from "../../util/constant";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { deleteRoom, liveMemberUpdate } from "../../services/liveServices";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../slices/memberSlice";
 
-const MemberModal = ({ liveMember, hostInfo }) => {
+const MemberModal = ({ liveMember, hostInfo, roomId, setIsOff, onUpdate }) => {
+  const memberNum = useSelector((state) => state.member.member.memberNum);
+  const access = useSelector((state) => state.member.access);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const onChangeMember = async () => {
+    try {
+      const isUpdate = await liveMemberUpdate(access, roomId);
+      if (isUpdate) {
+        onUpdate(memberNum);
+      }
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate("/");
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
+  };
+  const onDeleteRoom = async () => {
+    try {
+      const response = await deleteRoom(access, roomId);
+      setIsOff(response.data.message);
+      alert("LIVE가 종료되었습니다.");
+      navigate("/");
+    } catch (error) {
+      if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
+        dispatch(logout());
+        navigate("/");
+      } else {
+        alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
+      }
+    }
+  };
+
   return (
     <>
       <div className="absolute w-[250px] z-20 border border-gray-300 bg-white shadow-lg text-start left-[-100px] top-[50px] rounded">
-        <div className="flex items-center px-1 py-2 w-[90%] m-auto">
-          <div className="w-[40px] h-[40px] mr-2">
-            <LazyLoadImage
-              src={`${process.env.PUBLIC_URL}/image/default/profile.svg`}
-              alt="프로필"
-              className={`w-full h-full object-cover fill border rounded-full`}
-              width={40}
-              height={40}
-            />
+        <div className="px-2 mt-[12px]">튜터</div>
+        <div className="flex items-center p-2">
+          <div className="flex items-center flex-1">
+            <div className="w-[40px] h-[40px] mr-2">
+              <LazyLoadImage
+                src={
+                  hostInfo.profileImg ||
+                  `${process.env.PUBLIC_URL}/image/default/profile.svg`
+                }
+                alt="프로필"
+                className={`w-full h-full object-cover fill border rounded-full`}
+                width={40}
+                height={40}
+              />
+            </div>
+            <p
+              className={`text-blue--500" : "text-black"
+               text-xs font-bold`}
+            >
+              {hostInfo.nickname}
+            </p>
           </div>
-          <p className="text-xs text-black font-bold">hostInfo</p>
+
+          <div className="text-xs border text-center px-2 py-1 text-white bg-blue--500">
+            튜터
+          </div>
         </div>
 
-        <hr className="w-[90%] m-auto my-[12px]" />
+        <hr className="w-[90%] m-auto mb-[4px] " />
+        <div className="px-2 mt-[12px]">튜티</div>
 
-        <LazyLoadImage
-          src={`${process.env.PUBLIC_URL}/image/profile/mypage.svg`}
-          alt="마이페이지 아이콘"
-          className="max-w-full "
-          width={24}
-          height={24}
-        />
-        <p className="cursor-pointer p-2 text-xs font-medium">마이페이지</p>
+        {liveMember.map((item, index) => {
+          if (index === 0) return null;
 
-        <hr className="w-[90%] m-auto my-[12px]" />
-        <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100">
-          <LazyLoadImage
-            src={`${process.env.PUBLIC_URL}/image/profile/setting.svg`}
-            alt="설정 아이콘"
-            className=" "
-            width={24}
-            height={24}
-          />
-          <p className="cursor-pointer  p-2 text-xs font-medium">설정</p>
-        </div>
-        <div className="w-[90%] rounded-[5px] m-auto flex items-center py-1 object-contain px-2 hover:bg-gray--100 mb-[12px]">
-          <LazyLoadImage
-            src={`${process.env.PUBLIC_URL}/image/profile/logout.svg`}
-            alt="로그아웃 아이콘"
-            className=" "
-            width={24}
-            height={24}
-          />
+          return (
+            <div key={index} className="flex items-center mb-[8px]">
+              <div className="flex items-center p-2 flex-1">
+                <div className="flex items-center flex-1">
+                  <div className="w-[40px] h-[40px] mr-2">
+                    <LazyLoadImage
+                      src={
+                        item.profileImg ||
+                        `${process.env.PUBLIC_URL}/image/default/profile.svg`
+                      }
+                      alt="프로필"
+                      className={`w-full h-full object-cover fill border rounded-full`}
+                      width={40}
+                      height={40}
+                    />
+                  </div>
+                  <p className={`text-black text-xs font-bold`}>
+                    {item.nickname}
+                  </p>
+                </div>
 
-          <p className="cursor-pointer  p-2 text-xs font-medium">로그아웃</p>
-        </div>
+                <div
+                  className={`${
+                    item.initStatus ? "bg-green--500" : "bg-red--500"
+                  } text-xs border text-center rounded-full w-[20px] h-[20px] mr-3`}
+                ></div>
+              </div>
+            </div>
+          );
+        })}
+        <button className="w-full bg-red-100 h-[50px] text-red--500 font-semibold">
+          {hostInfo.memberNum === memberNum ? (
+            <p onClick={onDeleteRoom}>LIVE 종료</p>
+          ) : (
+            <p onClick={onChangeMember}>나가기</p>
+          )}
+        </button>
       </div>
     </>
   );

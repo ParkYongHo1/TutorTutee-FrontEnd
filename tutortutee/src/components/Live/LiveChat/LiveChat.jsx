@@ -6,7 +6,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import MemberModal from "../../modal/MemberModal";
 import LiveChatList from "./LiveChatList";
 
-const LiveChat = ({ roomId }) => {
+const LiveChat = ({ roomId, isOff, setIsOff }) => {
   const access = useSelector((state) => state.member.access);
   const [liveMember, setLiveMember] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -38,7 +38,16 @@ const LiveChat = ({ roomId }) => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-  console.log(hostInfo);
+
+  const handleChangeInitStatus = (memberNum) => {
+    setLiveMember((prev) => {
+      prev.map((member) =>
+        member.memberNum === memberNum
+          ? { ...member, initStatus: !member.initStatus }
+          : member
+      );
+    });
+  };
 
   return (
     <div className="flex flex-col w-[35vw] h-[100vh] bg-green-50 px-3">
@@ -73,7 +82,13 @@ const LiveChat = ({ roomId }) => {
               />
               <p>{liveMember.length}</p>
               {isDropdownOpen && (
-                <MemberModal liveMember={liveMember} hostInfo={hostInfo} />
+                <MemberModal
+                  liveMember={liveMember}
+                  hostInfo={hostInfo}
+                  roomId={roomId}
+                  setIsOff={setIsOff}
+                  onUpdate={handleChangeInitStatus}
+                />
               )}
             </div>
           </div>
