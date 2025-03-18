@@ -50,7 +50,7 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
   };
 
   return (
-    <div className="flex flex-col w-[35vw] h-[100vh] bg-green-50 px-3">
+    <div className="flex flex-col w-[35vw] h-[100vh] px-3">
       <div className="min-h-[10vh] flex justify-between items-center">
         <div className="flex justify-between gap-[15px] items-center">
           <div className="w-[80px] h-[80px] ">
@@ -94,10 +94,9 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
           </div>
         </div>
       </div>
-      <div className="min-h-[70vh] border">
+      <div className="min-h-[90vh]">
         <LiveChatList />
       </div>
-      <textarea className="min-h-[20vh] border" />
     </div>
   );
 };
