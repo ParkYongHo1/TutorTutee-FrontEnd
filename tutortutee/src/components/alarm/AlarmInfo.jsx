@@ -41,11 +41,11 @@ const AlarmInfo = ({ alarm, onDelete }) => {
       ? `/profile/${alarm.memberNum}`
       : alarm.alimType === "TYPE_LECTURE"
       ? `/live/${alarm.memberNum}`
-      : "";
+      : null;
 
   return (
     <>
-      <DefaultAlarm alarm={alarm} onDelete={onDelete} />
+      <DefaultAlarm alarm={alarm} onDelete={onDelete} alarmLink={alarmLink} />
     </>
   );
 };

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../slices/memberSlice";
 import { alarmDelete } from "../../services/alarmServices";
 
-export default function DefaultAlarm({ alarm, onDelete }) {
+export default function DefaultAlarm({ alarm, onDelete, alarmLink }) {
   const dispatch = useDispatch();
   const access = useSelector((state) => state.member.access);
   const navigate = useNavigate();
@@ -27,11 +27,14 @@ export default function DefaultAlarm({ alarm, onDelete }) {
     }
   };
   return (
-    <div className={`w-[380px] min-h-[120px] m-auto mb-3 cursor-pointer`}>
+    <Link
+      to={alarmLink}
+      className={`w-[380px] min-h-[120px] m-auto  cursor-pointer`}
+    >
       <div
         className={`${
           alarm.read ? "bg-gray--100" : "bg-white"
-        }  p-4 rounded-lg shadow-md w-full `}
+        }  p-4 rounded-lg shadow-md mt-5 w-[380px] m-auto min-h-[120px]`}
       >
         <div className="flex items-center  text-xs justify-between mb-2 ">
           <div
@@ -87,6 +90,6 @@ export default function DefaultAlarm({ alarm, onDelete }) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
