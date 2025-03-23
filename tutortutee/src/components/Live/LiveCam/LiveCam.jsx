@@ -30,8 +30,6 @@ const LiveCam = ({ roomId, hostInfo }) => {
       });
 
       peerConnectionRef.current.onicecandidate = (event) => {
-        console.log("teset");
-
         if (event.candidate) {
           const messageType =
             hostInfo.memberNum === memberNum ? "create_room" : "join_room";
@@ -45,15 +43,19 @@ const LiveCam = ({ roomId, hostInfo }) => {
         }
       };
 
-      const offer = await peerConnectionRef.current.createOffer();
-      await peerConnectionRef.current.setLocalDescription(offer);
-      socketRef.current.send(
-        JSON.stringify({
-          type: "offer",
-          offer,
-          roomId,
-        })
-      );
+      if (hostInfo.memberNum === memberNum) {
+        console.log("offer send");
+
+        const offer = await peerConnectionRef.current.createOffer();
+        await peerConnectionRef.current.setLocalDescription(offer);
+        socketRef.current.send(
+          JSON.stringify({
+            type: "offer",
+            offer,
+            roomId,
+          })
+        );
+      }
 
       peerConnectionRef.current.ontrack = (event) => {
         if (event.streams && event.streams[0]) {
@@ -83,7 +85,7 @@ const LiveCam = ({ roomId, hostInfo }) => {
     socketRef.current.onmessage = async (event) => {
       const data = JSON.parse(event.data);
 
-      if (data.type === "offer") {
+      if (data.type === "offer" && hostInfo.memberNum !== memberNum) {
         await peerConnectionRef.current.setRemoteDescription(
           new RTCSessionDescription(data.offer)
         );
@@ -105,7 +107,7 @@ const LiveCam = ({ roomId, hostInfo }) => {
     };
 
     return () => {
-      socketRef.current.onmessage = null;
+      socketRef.current.onmessage = null; // 이벤트 핸들러 제거
     };
   }, [roomId]);
 
