@@ -7,6 +7,8 @@ import { logout, setMemberInfoChange } from "../../slices/memberSlice";
 import { useNavigate } from "react-router-dom";
 
 const AlarmInfo = ({ alarm, onDelete }) => {
+  console.log(alarm.roomId);
+
   const access = useSelector((state) => state.member.access);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -40,7 +42,7 @@ const AlarmInfo = ({ alarm, onDelete }) => {
     alarm.alimType === "TYPE_NOTICE"
       ? `/profile/${alarm.memberNum}`
       : alarm.alimType === "TYPE_LECTURE"
-      ? `/live/${alarm.memberNum}`
+      ? `/live/${alarm.roomId}`
       : null;
 
   return (

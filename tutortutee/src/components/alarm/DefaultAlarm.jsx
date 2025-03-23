@@ -6,8 +6,11 @@ import { ALARM_TYPE, ALARM_TYPE_MESSAGE } from "../../util/constant";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../slices/memberSlice";
 import { alarmDelete } from "../../services/alarmServices";
+import { liveMemberUpdate } from "../../services/liveServices";
 
 export default function DefaultAlarm({ alarm, onDelete, alarmLink }) {
+  console.log(alarm);
+
   const dispatch = useDispatch();
   const access = useSelector((state) => state.member.access);
   const navigate = useNavigate();
@@ -26,15 +29,26 @@ export default function DefaultAlarm({ alarm, onDelete, alarmLink }) {
       }
     }
   };
+
+  const handleMovePage = async () => {
+    try {
+      if (alarm.alimType === "TYPE_LECTURE") {
+        const response = await liveMemberUpdate(access, alarm.roomId);
+        navigate(alarmLink);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
-    <Link
-      to={alarmLink}
-      className={`w-[380px] min-h-[120px] m-auto  cursor-pointer`}
+    <div
+      className={`w-[380px] min-h-[120px] m-auto mb-3 cursor-pointer`}
+      onClick={handleMovePage}
     >
       <div
         className={`${
           alarm.read ? "bg-gray--100" : "bg-white"
-        }  p-4 rounded-lg shadow-md mt-5 w-[380px] m-auto min-h-[120px]`}
+        }  p-4 rounded-lg shadow-md w-full `}
       >
         <div className="flex items-center  text-xs justify-between mb-2 ">
           <div
@@ -90,6 +104,6 @@ export default function DefaultAlarm({ alarm, onDelete, alarmLink }) {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
