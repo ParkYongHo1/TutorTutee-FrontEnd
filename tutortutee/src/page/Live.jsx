@@ -12,12 +12,14 @@ const Live = () => {
   const [liveMember, setLiveMember] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [hostInfo, setHostInfo] = useState({});
+  const [hostMemberNum, setHostMemberNum] = useState(0);
   useEffect(() => {
     const loadLiveMember = async () => {
       try {
         const response = await loadMember(access, roomId);
         setLiveMember(response.data.participantList);
         setHostInfo(response.data.participantList[0]);
+        setHostMemberNum(response.data.hostMemberNum);
       } catch (error) {
         console.log(error);
       }
@@ -27,7 +29,11 @@ const Live = () => {
   return (
     <div className=" w-[1700px] m-auto ">
       <div className="flex items-center">
-        <LiveCam roomId={roomId} hostInfo={hostInfo} />
+        <LiveCam
+          roomId={roomId}
+          hostInfo={hostInfo}
+          hostMemberNum={hostMemberNum}
+        />
         <LiveChat roomId={roomId} setIsOff={setIsOff} isOff={isOff} />
       </div>
     </div>

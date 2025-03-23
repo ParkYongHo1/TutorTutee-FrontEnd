@@ -15,6 +15,8 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
     const loadLiveMember = async () => {
       try {
         const response = await loadMember(access, roomId);
+        console.log(response);
+
         setLiveMember(response.data.participantList);
         setHostInfo(response.data.participantList[0]);
       } catch (error) {
