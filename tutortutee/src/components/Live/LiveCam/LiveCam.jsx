@@ -4,11 +4,12 @@ import { useSelector } from "react-redux";
 
 const LiveCam = ({ roomId, hostInfo }) => {
   const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
   const peerConnectionRef = useRef(null);
   const localStreamRef = useRef(null);
-  const access = useSelector((state) => state.member.access);
   const socketRef = useRef(null);
   const memberNum = useSelector((state) => state.member.member.memberNum);
+
   useEffect(() => {
     socketRef.current = new SockJS("https://tutor-tutee.shop/signaling");
 
@@ -18,45 +19,30 @@ const LiveCam = ({ roomId, hostInfo }) => {
         audio: true,
       });
 
-      localVideoRef.current.srcObject = localStreamRef.current;
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = localStreamRef.current;
+      }
 
       peerConnectionRef.current = new RTCPeerConnection();
 
       localStreamRef.current.getTracks().forEach((track) => {
         peerConnectionRef.current.addTrack(track, localStreamRef.current);
       });
-      if (hostInfo.memberNum === memberNum) {
-        peerConnectionRef.current.onicecandidate = (event) => {
-          if (event.candidate) {
-            socketRef.current.send(
-              JSON.stringify({
-                type: "create_room",
-                candidate: event.candidate,
-                roomId,
-              })
-            );
-          }
-        };
-      } else {
-        peerConnectionRef.current.onicecandidate = (event) => {
-          if (event.candidate) {
-            socketRef.current.send(
-              JSON.stringify({
-                type: "join_room",
-                candidate: event.candidate,
-                roomId,
-              })
-            );
-          }
-        };
-      }
 
-      peerConnectionRef.current.ontrack = (event) => {
-        const remoteVideo = document.createElement("video");
-        remoteVideo.srcObject = event.streams[0];
-        remoteVideo.autoplay = true;
-        remoteVideo.playsInline = true;
-        document.body.append(remoteVideo);
+      peerConnectionRef.current.onicecandidate = (event) => {
+        console.log("teset");
+
+        if (event.candidate) {
+          const messageType =
+            hostInfo.memberNum === memberNum ? "create_room" : "join_room";
+          socketRef.current.send(
+            JSON.stringify({
+              type: messageType,
+              candidate: event.candidate,
+              roomId,
+            })
+          );
+        }
       };
 
       const offer = await peerConnectionRef.current.createOffer();
@@ -68,16 +54,26 @@ const LiveCam = ({ roomId, hostInfo }) => {
           roomId,
         })
       );
+
+      peerConnectionRef.current.ontrack = (event) => {
+        if (event.streams && event.streams[0]) {
+          remoteVideoRef.current.srcObject = event.streams[0];
+        }
+      };
     };
 
     startVideoChat();
 
     return () => {
-      localStreamRef.current.getTracks().forEach((track) => track.stop());
-      peerConnectionRef.current.close();
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach((track) => track.stop());
+      }
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close();
+      }
       socketRef.current.close();
     };
-  }, [roomId]);
+  }, [roomId, hostInfo, memberNum]);
 
   useEffect(() => {
     socketRef.current.onopen = () => {
@@ -119,7 +115,13 @@ const LiveCam = ({ roomId, hostInfo }) => {
         ref={localVideoRef}
         autoPlay
         playsInline
-        style={{ width: "1%", height: "auto" }}
+        style={{ width: "10%", height: "auto" }}
+      />
+      <video
+        ref={remoteVideoRef}
+        autoPlay
+        playsInline
+        style={{ width: "10%", height: "auto" }}
       />
     </div>
   );
