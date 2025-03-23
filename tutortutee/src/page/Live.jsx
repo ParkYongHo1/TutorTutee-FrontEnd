@@ -1,15 +1,33 @@
 import { useParams } from "react-router-dom";
 import LiveCam from "../components/live/liveCam/LiveCam";
 import LiveChat from "../components/live/liveChat/LiveChat";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { loadMember } from "../services/roomServices";
 
 const Live = () => {
   const { roomId } = useParams();
   const [isOff, setIsOff] = useState("");
+  const access = useSelector((state) => state.member.access);
+  const [liveMember, setLiveMember] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [hostInfo, setHostInfo] = useState({});
+  useEffect(() => {
+    const loadLiveMember = async () => {
+      try {
+        const response = await loadMember(access, roomId);
+        setLiveMember(response.data.participantList);
+        setHostInfo(response.data.participantList[0]);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    loadLiveMember();
+  }, [access, roomId]);
   return (
     <div className=" w-[1700px] m-auto ">
       <div className="flex items-center">
-        <LiveCam />
+        <LiveCam roomId={roomId} hostInfo={hostInfo} />
         <LiveChat roomId={roomId} setIsOff={setIsOff} isOff={isOff} />
       </div>
     </div>
