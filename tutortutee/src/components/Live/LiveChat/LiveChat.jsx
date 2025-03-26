@@ -1,16 +1,123 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { loadMember } from "../../../services/roomServices";
 import { useSelector } from "react-redux";
 import { useParams, useSearchParams } from "react-router-dom";
 import MemberModal from "../../modal/MemberModal";
 import LiveChatList from "./LiveChatList";
+import { Client, Stomp } from "@stomp/stompjs";
+import { chattingList } from "../../../services/liveServices";
+import * as SockJS from "sockjs-client";
 
 const LiveChat = ({ roomId, isOff, setIsOff }) => {
   const access = useSelector((state) => state.member.access);
+  const me = useSelector((state) => state.member.member);
   const [liveMember, setLiveMember] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [hostInfo, setHostInfo] = useState({});
+  const [messages, setMessages] = useState([]); // 채팅 메시지 상태 추가
+  const stompClientRef = useRef(null); // STOMP 클라이언트 관리
+
+  useEffect(() => {
+    if (!stompClientRef.current) {
+      console.log("Creating new STOMP client...");
+      const socket = new SockJS("https://tutor-tutee.shop/chattings");
+      const stompClient = new Client({
+        webSocketFactory: () => socket,
+        connectHeaders: {
+          Authorization: `Bearer ${access}`,
+        },
+        onConnect: (frame) => {
+          console.log("Connected to WebSocket:", frame);
+
+          stompClient.subscribe(
+            `/sub/${roomId}`,
+            (messageOutput) => {
+              console.log("Received message:", messageOutput.body);
+              const newMessage = JSON.parse(messageOutput.body);
+
+              setMessages((prevMessages) => {
+                if (newMessage.type === "TYPE_IN") {
+                  const hasJoinMessage = prevMessages.some(
+                    (msg) =>
+                      msg.type === "TYPE_IN" &&
+                      msg.nickname === newMessage.nickname
+                  );
+                  return hasJoinMessage
+                    ? prevMessages
+                    : [...prevMessages, newMessage];
+                }
+                return [...prevMessages, newMessage];
+              });
+            },
+            { Authorization: `Bearer ${access}` }
+          );
+
+          console.log("Subscribed to room:", roomId);
+          stompClientRef.current = stompClient;
+        },
+      });
+
+      stompClient.activate();
+    }
+
+    fetchMessages();
+
+    return () => {
+      if (stompClientRef.current) {
+        console.log("Disconnecting STOMP client...");
+        stompClientRef.current.deactivate();
+        stompClientRef.current = null;
+      }
+    };
+  }, [roomId]);
+
+  // 기존 채팅 메시지 로딩 (API 호출)
+  const fetchMessages = async () => {
+    try {
+      const response = await chattingList(access, roomId);
+
+      setMessages((prevMessages) => {
+        const newMessages = response.data.chattingList.filter((newMsg) => {
+          // 기존에 있는 입장/퇴장 메시지는 추가하지 않음
+          if (newMsg.type === "TYPE_IN" || newMsg.type === "TYPE_OUT") {
+            return !prevMessages.some(
+              (msg) =>
+                msg.nickname === newMsg.nickname && msg.type === newMsg.type
+            );
+          }
+          return true;
+        });
+
+        return [...prevMessages, ...newMessages];
+      });
+      console.log(messages);
+    } catch (error) {
+      console.log("채팅 메시지 불러오기 실패", error);
+    }
+  };
+
+  // 메시지 전송 함수
+  const sendMessage = (text, imageUrl) => {
+    if (stompClientRef.current && stompClientRef.current.connected) {
+      const messageObj = {
+        roomId: roomId,
+        nickname: me.nickname,
+        content: text,
+        profileImg: me.profileImg,
+        type: imageUrl ? "TYPE_IMG" : "TYPE_TEXT",
+      };
+      stompClientRef.current.publish({
+        destination: `/pub/${roomId}/messages`,
+        headers: { Authorization: `Bearer ${access}` },
+        body: JSON.stringify(messageObj),
+      });
+      console.log("메시지 발행 성공:", messageObj);
+    } else {
+      console.error("STOMP 클라이언트가 활성화되지 않음");
+    }
+  };
+
   useEffect(() => {
     const loadLiveMember = async () => {
       try {
@@ -25,6 +132,7 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
     };
     loadLiveMember();
   }, [access, roomId]);
+
   const handleMemberModal = () => {
     setIsDropdownOpen((prev) => !prev);
   };
@@ -97,7 +205,7 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
         </div>
       </div>
       <div className="min-h-[90vh]">
-        <LiveChatList />
+        <LiveChatList messages={messages} onSendMessage={sendMessage} me={me} />
       </div>
     </div>
   );
