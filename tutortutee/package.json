@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
-    "@stomp/stompjs": "^7.1.0",
+    "@stomp/stompjs": "^7.0.1",
     "@tailwindcss/typography": "^0.5.16",
     "axios": "^1.7.9",
     "cra-template": "1.2.0",
@@ -19,7 +19,6 @@
     "react-router-dom": "^7.1.3",
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
-    "socket.io-client": "^4.8.1",
     "sockjs-client": "^1.6.1",
     "tutortutee": "file:"
   },

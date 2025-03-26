@@ -22,3 +22,11 @@ export const deleteRoom = async (access, roomId) => {
     },
   });
 };
+
+export const chattingList = async (access, roomId) => {
+  return await axios.get(`${BASE_URL}/chattings/list?roomId=${roomId}`, {
+    headers: {
+      Authorization: `Bearer ${access}`,
+    },
+  });
+};
