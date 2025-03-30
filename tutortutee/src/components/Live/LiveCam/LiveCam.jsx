@@ -9,11 +9,12 @@ const LiveCam = ({ roomId, hostInfo, hostMemberNum }) => {
   const localStreamRef = useRef(null);
   const socketRef = useRef(null);
   const memberNum = useSelector((state) => state.member.member.memberNum);
+
   useEffect(() => {
     socketRef.current = new SockJS("https://tutor-tutee.shop/signaling");
 
     socketRef.current.onopen = () => {
-      console.log("Connected to signaling server");
+      console.log("신호 서버에 연결됨");
     };
 
     socketRef.current.onmessage = async (event) => {
@@ -21,18 +22,13 @@ const LiveCam = ({ roomId, hostInfo, hostMemberNum }) => {
       console.log(data);
 
       if (data.type === "new_member" && hostInfo.memberNum !== memberNum) {
-        console.log("참여자");
-
-        // 참여자가 연결될 때 peerConnection이 초기화되었는지 확인
         if (!peerConnectionRef.current) {
           peerConnectionRef.current = new RTCPeerConnection();
-          // 로컬 트랙 추가
           localStreamRef.current.getTracks().forEach((track) => {
             peerConnectionRef.current.addTrack(track, localStreamRef.current);
           });
         }
 
-        // Offer 처리
         await peerConnectionRef.current.setRemoteDescription(
           new RTCSessionDescription(data.offer)
         );
@@ -53,7 +49,6 @@ const LiveCam = ({ roomId, hostInfo, hostMemberNum }) => {
       }
     };
 
-    // 비디오 채팅 시작
     const startVideoChat = async () => {
       localStreamRef.current = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -71,12 +66,18 @@ const LiveCam = ({ roomId, hostInfo, hostMemberNum }) => {
       });
 
       peerConnectionRef.current.onicecandidate = (event) => {
-        if (event.candidate) {
-          const messageType =
-            hostMemberNum === memberNum ? "create_room" : "join_room";
+        if (hostMemberNum === memberNum) {
           socketRef.current.send(
             JSON.stringify({
-              type: messageType,
+              type: "create_room",
+              candidate: event.candidate,
+              roomId,
+            })
+          );
+        } else {
+          socketRef.current.send(
+            JSON.stringify({
+              type: "join_room",
               candidate: event.candidate,
               roomId,
             })
@@ -85,7 +86,7 @@ const LiveCam = ({ roomId, hostInfo, hostMemberNum }) => {
       };
 
       if (hostMemberNum === memberNum) {
-        console.log("offer send");
+        console.log("Offer 전송");
         const offer = await peerConnectionRef.current.createOffer();
         await peerConnectionRef.current.setLocalDescription(offer);
         socketRef.current.send(
@@ -112,7 +113,8 @@ const LiveCam = ({ roomId, hostInfo, hostMemberNum }) => {
       }
       socketRef.current.close();
     };
-  }, [roomId, hostInfo, memberNum]);
+  }, [roomId, hostInfo, memberNum, hostMemberNum]);
+
   return (
     <div className="flex flex-col items-center justify-center w-[65vw] h-[100vh] bg-blue-50">
       <video
