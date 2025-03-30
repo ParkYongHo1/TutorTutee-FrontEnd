@@ -8,6 +8,7 @@ import LiveChatList from "./LiveChatList";
 import { Client, Stomp } from "@stomp/stompjs";
 import { chattingList } from "../../../services/liveServices";
 import * as SockJS from "sockjs-client";
+import axios from "axios";
 
 const LiveChat = ({ roomId, isOff, setIsOff }) => {
   const access = useSelector((state) => state.member.access);
@@ -20,7 +21,6 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
 
   useEffect(() => {
     if (!stompClientRef.current) {
-      console.log("Creating new STOMP client...");
       const socket = new SockJS("https://tutor-tutee.shop/chattings");
       const stompClient = new Client({
         webSocketFactory: () => socket,
@@ -28,12 +28,9 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
           Authorization: `Bearer ${access}`,
         },
         onConnect: (frame) => {
-          console.log("Connected to WebSocket:", frame);
-
           stompClient.subscribe(
             `/sub/${roomId}`,
             (messageOutput) => {
-              console.log("Received message:", messageOutput.body);
               const newMessage = JSON.parse(messageOutput.body);
 
               setMessages((prevMessages) => {
@@ -53,7 +50,6 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
             { Authorization: `Bearer ${access}` }
           );
 
-          console.log("Subscribed to room:", roomId);
           stompClientRef.current = stompClient;
         },
       });
@@ -65,7 +61,6 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
 
     return () => {
       if (stompClientRef.current) {
-        console.log("Disconnecting STOMP client...");
         stompClientRef.current.deactivate();
         stompClientRef.current = null;
       }
@@ -79,7 +74,6 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
 
       setMessages((prevMessages) => {
         const newMessages = response.data.chattingList.filter((newMsg) => {
-          // 기존에 있는 입장/퇴장 메시지는 추가하지 않음
           if (newMsg.type === "TYPE_IN" || newMsg.type === "TYPE_OUT") {
             return !prevMessages.some(
               (msg) =>
@@ -98,21 +92,39 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
   };
 
   // 메시지 전송 함수
-  const sendMessage = (text, imageUrl) => {
+  const sendMessage = async (formData) => {
     if (stompClientRef.current && stompClientRef.current.connected) {
-      const messageObj = {
-        roomId: roomId,
-        nickname: me.nickname,
-        content: text,
-        profileImg: me.profileImg,
-        type: imageUrl ? "TYPE_IMG" : "TYPE_TEXT",
-      };
-      stompClientRef.current.publish({
-        destination: `/pub/${roomId}/messages`,
-        headers: { Authorization: `Bearer ${access}` },
-        body: JSON.stringify(messageObj),
-      });
-      console.log("메시지 발행 성공:", messageObj);
+      try {
+        // 이미지 업로드
+        const imageResponse = await axios.post(
+          `${process.env.REACT_APP_BASE_URL}/chattings/image`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${access}`,
+            },
+          }
+        );
+
+        // 이미지 URL을 포함한 메시지 전송
+        const messageObj = {
+          roomId: roomId,
+          nickname: me.nickname,
+          content: formData.get("message"), // 메시지 텍스트
+          imageUrl: imageResponse.data.imageUrl, // 업로드된 이미지 URL
+          profileImg: me.profileImg,
+          type: imageResponse.data.imageUrl ? "TYPE_IMG" : "TYPE_TEXT",
+        };
+
+        stompClientRef.current.publish({
+          destination: `/pub/${roomId}/messages`,
+          headers: { Authorization: `Bearer ${access}` },
+          body: JSON.stringify(messageObj),
+        });
+      } catch (error) {
+        console.error("메시지 전송 실패:", error);
+      }
     } else {
       console.error("STOMP 클라이언트가 활성화되지 않음");
     }
@@ -122,7 +134,6 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
     const loadLiveMember = async () => {
       try {
         const response = await loadMember(access, roomId);
-        console.log(response);
 
         setLiveMember(response.data.participantList);
         setHostInfo(response.data.participantList[0]);
