@@ -16,8 +16,8 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
   const [liveMember, setLiveMember] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [hostInfo, setHostInfo] = useState({});
-  const [messages, setMessages] = useState([]); // 채팅 메시지 상태 추가
-  const stompClientRef = useRef(null); // STOMP 클라이언트 관리
+  const [messages, setMessages] = useState([]);
+  const stompClientRef = useRef(null);
 
   useEffect(() => {
     if (!stompClientRef.current) {
@@ -92,41 +92,60 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
   };
 
   // 메시지 전송 함수
-  const sendMessage = async (formData) => {
-    if (stompClientRef.current && stompClientRef.current.connected) {
-      try {
-        // 이미지 업로드
+  const sendMessage = async (text, imageBase64) => {
+    if (!text && !imageBase64) return;
+
+    try {
+      // 1. 텍스트 메시지 먼저 보내기
+      if (text) {
+        stompClientRef.current.publish({
+          destination: `/pub/${roomId}/messages`,
+          body: JSON.stringify({
+            roomId: roomId,
+            nickname: me.nickname,
+            content: text,
+            profileImg: me.profileImg,
+            type: "TYPE_TEXT",
+          }),
+        });
+      }
+
+      // 2. 이미지 메시지는 업로드 -> URL 받아서 보내기
+      if (imageBase64) {
+        const uploadFormData = new FormData();
+        const blob = await (await fetch(imageBase64)).blob();
+        uploadFormData.append(
+          "image",
+          new File([blob], "upload_image.png", { type: blob.type })
+        );
+
         const imageResponse = await axios.post(
           `${process.env.REACT_APP_BASE_URL}/chattings/image`,
-          formData,
+          uploadFormData,
           {
             headers: {
-              "Content-Type": "multipart/form-data",
               Authorization: `Bearer ${access}`,
+              "Content-Type": "multipart/form-data",
             },
           }
         );
 
-        // 이미지 URL을 포함한 메시지 전송
-        const messageObj = {
-          roomId: roomId,
-          nickname: me.nickname,
-          content: formData.get("message"), // 메시지 텍스트
-          imageUrl: imageResponse.data.imageUrl, // 업로드된 이미지 URL
-          profileImg: me.profileImg,
-          type: imageResponse.data.imageUrl ? "TYPE_IMG" : "TYPE_TEXT",
-        };
+        const imageUrl = imageResponse.data.url; // <- 명세 보니까 응답이 이렇게 옴
+        console.log("img:", imageResponse);
 
         stompClientRef.current.publish({
           destination: `/pub/${roomId}/messages`,
-          headers: { Authorization: `Bearer ${access}` },
-          body: JSON.stringify(messageObj),
+          body: JSON.stringify({
+            roomId: roomId,
+            nickname: me.nickname,
+            content: imageUrl,
+            profileImg: me.profileImg,
+            type: "TYPE_IMG",
+          }),
         });
-      } catch (error) {
-        console.error("메시지 전송 실패:", error);
       }
-    } else {
-      console.error("STOMP 클라이언트가 활성화되지 않음");
+    } catch (error) {
+      console.error("메시지 전송 실패:", error);
     }
   };
 

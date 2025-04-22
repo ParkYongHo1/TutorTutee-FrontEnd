@@ -20,7 +20,7 @@ const LiveChatList = ({ messages, onSendMessage, me }) => {
     const formattedMinutes = minutes.toString().padStart(2, "0");
     return `${ampm} ${formattedHours}:${formattedMinutes}`;
   };
-  console.log(messages);
+  console.log("msg:", messages);
 
   return (
     <div className="flex flex-col w-full h-full border bg-white rounded-lg shadow-md">
@@ -101,7 +101,7 @@ const LiveChatList = ({ messages, onSendMessage, me }) => {
                     </div>
                   ) : (
                     <LazyLoadImage
-                      src={msg.imageUrl}
+                      src={msg.content}
                       alt="업로드된 이미지"
                       className="w-32 h-32 object-cover rounded-lg cursor-pointer"
                       onClick={() => setPreviewImage(msg.content)}
@@ -121,7 +121,9 @@ const LiveChatList = ({ messages, onSendMessage, me }) => {
         <div ref={messagesEndRef}></div>
       </div>
 
-      <ChatInput onSendMessage={onSendMessage} />
+      <ChatInput
+        onSendMessage={(text, imageBase64) => onSendMessage(text, imageBase64)}
+      />
 
       {previewImage && (
         <div
