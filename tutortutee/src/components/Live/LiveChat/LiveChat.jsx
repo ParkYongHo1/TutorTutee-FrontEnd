@@ -9,6 +9,7 @@ import { Client, Stomp } from "@stomp/stompjs";
 import { chattingList } from "../../../services/liveServices";
 import * as SockJS from "sockjs-client";
 import axios from "axios";
+import useUploadImage from "../../../hooks/useUploadImage";
 
 const LiveChat = ({ roomId, isOff, setIsOff }) => {
   const access = useSelector((state) => state.member.access);
@@ -21,6 +22,7 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
 
   useEffect(() => {
     if (!stompClientRef.current) {
+      console.log("Creating new STOMP client...");
       const socket = new SockJS("https://tutor-tutee.shop/chattings");
       const stompClient = new Client({
         webSocketFactory: () => socket,
@@ -28,9 +30,12 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
           Authorization: `Bearer ${access}`,
         },
         onConnect: (frame) => {
+          console.log("Connected to WebSocket:", frame);
+
           stompClient.subscribe(
             `/sub/${roomId}`,
             (messageOutput) => {
+              console.log("Received message:", messageOutput.body);
               const newMessage = JSON.parse(messageOutput.body);
 
               setMessages((prevMessages) => {
@@ -50,6 +55,7 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
             { Authorization: `Bearer ${access}` }
           );
 
+          console.log("Subscribed to room:", roomId);
           stompClientRef.current = stompClient;
         },
       });
@@ -61,6 +67,7 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
 
     return () => {
       if (stompClientRef.current) {
+        console.log("Disconnecting STOMP client...");
         stompClientRef.current.deactivate();
         stompClientRef.current = null;
       }
@@ -74,6 +81,7 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
 
       setMessages((prevMessages) => {
         const newMessages = response.data.chattingList.filter((newMsg) => {
+          // 기존에 있는 입장/퇴장 메시지는 추가하지 않음
           if (newMsg.type === "TYPE_IN" || newMsg.type === "TYPE_OUT") {
             return !prevMessages.some(
               (msg) =>
@@ -153,6 +161,7 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
     const loadLiveMember = async () => {
       try {
         const response = await loadMember(access, roomId);
+        console.log(response);
 
         setLiveMember(response.data.participantList);
         setHostInfo(response.data.participantList[0]);
