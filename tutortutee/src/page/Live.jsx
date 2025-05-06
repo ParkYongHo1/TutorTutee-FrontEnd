@@ -1,11 +1,10 @@
 import { useParams } from "react-router-dom";
 
 import LiveChat from "../components/Live/LiveChat/LiveChat";
+import LiveCam from "../components/Live/LiveCam/LiveCam";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { loadMember } from "../services/roomServices";
-import LiveCam from "../components/live/liveCam/LiveCam";
-
 const Live = () => {
   const { roomId } = useParams();
   const [isOff, setIsOff] = useState("");
