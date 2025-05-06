@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-import LiveChat from "../components/live/liveChat/LiveChat";
+import LiveChat from "../components/Live/LiveChat/LiveChat";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { loadMember } from "../services/roomServices";
