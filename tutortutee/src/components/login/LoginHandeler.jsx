@@ -28,7 +28,7 @@ const LoginHandeler = (props) => {
         };
 
         dispatch(login({ member: memberInfo, access: response.data.access }));
-        navigate("/");
+        navigate(`/profile/${memberInfo?.memberNum}`);
       } catch (error) {
         if (error) {
           {

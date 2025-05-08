@@ -24,7 +24,7 @@ const App = () => {
   const isLoggedIn = useSelector((state) => state.member.isLoggedIn);
 
   return (
-    <Router>
+    <Router basename="/app">
       {isLoggedIn ? <Floating /> : ""}
       <LayoutWrapper>
         <Routes>
@@ -54,7 +54,7 @@ const LayoutWrapper = ({ children }) => {
   const location = useLocation();
 
   const hideHeader =
-    ["/login", "/signup", "/find", "/search", "/live"].includes(
+    ["/login", "/signup", "/find", "/search", "/live", "/"].includes(
       location.pathname
     ) || /^\/live\/.*/.test(location.pathname);
 

@@ -32,7 +32,7 @@ const LoginInput = () => {
         followerCount: response.data.followerCount,
       };
       dispatch(login({ member: memberInfo, access: response.data.access }));
-      navigate("/");
+      navigate(`profile/${memberInfo?.memberNum}`);
     } catch (error) {
       if (
         error.response.data.message ===

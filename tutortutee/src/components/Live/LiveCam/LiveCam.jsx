@@ -313,7 +313,7 @@ const LiveCam = ({ roomId, hostInfo, hostMemberNum }) => {
       console.log("카메라 시작 시도");
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
-        audio: false, // 오디오는 화면 공유에서만 사용
+        audio: true, // 오디오는 화면 공유에서만 사용
       });
 
       setCameraStream(stream);
@@ -528,37 +528,6 @@ const LiveCam = ({ roomId, hostInfo, hostMemberNum }) => {
         )}
 
         {/* 컨트롤 패널 */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 p-2 rounded-lg flex gap-2">
-          {/* 호스트: 화면/카메라 전환 버튼 */}
-          {isHost && (
-            <button
-              onClick={toggleDisplayMode}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-            >
-              {showCamera ? "화면 공유로 전환" : "카메라로 전환"}
-            </button>
-          )}
-
-          {/* 참여자: 카메라 켜기/끄기 버튼 */}
-          {!isHost && (
-            <button
-              onClick={toggleParticipantCamera}
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-            >
-              {cameraEnabled ? "카메라 끄기" : "카메라 켜기"}
-            </button>
-          )}
-
-          {/* 호스트: 방송 종료 버튼 */}
-          {isHost && (
-            <button
-              onClick={endBroadcast}
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-            >
-              방송 종료
-            </button>
-          )}
-        </div>
 
         {/* 연결 상태 디버깅 정보 */}
         <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white p-2 rounded">

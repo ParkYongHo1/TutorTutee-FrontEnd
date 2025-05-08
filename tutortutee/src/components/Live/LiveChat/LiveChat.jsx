@@ -229,7 +229,7 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
                 height={30}
                 onClick={handleMemberModal}
               />
-              <p>{liveMember.length}</p>
+              <p>{liveMember?.length}</p>
               {isDropdownOpen && (
                 <MemberModal
                   liveMember={liveMember}
@@ -237,6 +237,7 @@ const LiveChat = ({ roomId, isOff, setIsOff }) => {
                   roomId={roomId}
                   setIsOff={setIsOff}
                   onUpdate={handleChangeInitStatus}
+                  stompClientRef={stompClientRef}
                 />
               )}
             </div>

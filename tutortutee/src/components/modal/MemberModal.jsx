@@ -6,22 +6,47 @@ import { deleteRoom, liveMemberUpdate } from "../../services/liveServices";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../../slices/memberSlice";
 
-const MemberModal = ({ liveMember, hostInfo, roomId, setIsOff, onUpdate }) => {
+const MemberModal = ({
+  liveMember,
+  hostInfo,
+  roomId,
+  setIsOff,
+  onUpdate,
+  stompClientRef,
+}) => {
   const memberNum = useSelector((state) => state.member.member.memberNum);
+  const member = useSelector((state) => state.member.member);
   const access = useSelector((state) => state.member.access);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const onChangeMember = async () => {
     try {
+      // 먼저 STOMP 메시지 전송
+      if (stompClientRef.current) {
+        stompClientRef.current.publish({
+          destination: `/pub/${roomId}/messages`,
+          body: JSON.stringify({
+            roomId: roomId,
+            nickname: member.nickname,
+            content: "",
+            profileImg: member.profileImg,
+            type: "TYPE_OUT", // 퇴장 메시지 타입
+          }),
+        });
+      }
+      console.log("test");
+
+      // API 호출은 메시지 전송 후에 진행
       const isUpdate = await liveMemberUpdate(access, roomId);
       if (isUpdate) {
         onUpdate(memberNum);
       }
+      navigate(`/profile/${memberNum}`);
     } catch (error) {
+      // 기존 에러 처리 코드
       if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
         dispatch(logout());
-        navigate("/");
       } else {
         alert("오류가 발생했습니다. 잠시후 다시 시도해주세요.");
       }
@@ -32,7 +57,7 @@ const MemberModal = ({ liveMember, hostInfo, roomId, setIsOff, onUpdate }) => {
       const response = await deleteRoom(access, roomId);
       setIsOff(response.data.message);
       alert("LIVE가 종료되었습니다.");
-      navigate("/");
+      navigate(`/profile/${memberNum}`);
     } catch (error) {
       if (error.response?.data?.message === "리프레시 토큰이 만료되었습니다.") {
         dispatch(logout());
@@ -77,7 +102,7 @@ const MemberModal = ({ liveMember, hostInfo, roomId, setIsOff, onUpdate }) => {
         <hr className="w-[90%] m-auto mb-[4px] " />
         <div className="px-2 mt-[12px]">튜티</div>
 
-        {liveMember.map((item, index) => {
+        {liveMember?.map((item, index) => {
           if (index === 0) return null;
 
           return (

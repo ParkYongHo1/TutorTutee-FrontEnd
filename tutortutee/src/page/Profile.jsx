@@ -19,7 +19,7 @@ const Profile = () => {
     const loadProfileInfo = async () => {
       try {
         const response = await profileInfo(access, memberNum);
-        setMember(response.data);
+        setMember(response?.data);
       } catch (error) {
         if (
           error.response?.data?.message === "리프레시 토큰이 만료되었습니다."

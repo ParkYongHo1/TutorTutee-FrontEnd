@@ -1,6 +1,7 @@
 {
   "name": "tutortutee",
   "version": "0.1.0",
+  "homepage": "/app",
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",

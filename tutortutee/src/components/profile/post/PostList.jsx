@@ -24,7 +24,7 @@ const PostList = ({ memberNum }) => {
     const loadNotice = async () => {
       try {
         const response = await loadNoticeList(access, memberNum, observer);
-        setFlag(response.data.flag);
+        setFlag(response?.data.flag);
         setNotices((prev) => [...prev, ...response.data.notices]);
       } catch (error) {
         if (

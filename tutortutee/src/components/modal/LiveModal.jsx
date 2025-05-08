@@ -74,7 +74,10 @@ const LiveModal = ({ setIsLiveModalOpen }) => {
       const participantList = selectedMembers.map((member) => member.memberNum);
       const response = await alarmSend(access, participantList);
       alert("알림이 전송되었습니다.");
-      const newWindow = window.open(`/live/${response.data.roomId}`, "_blank");
+      const newWindow = window.open(
+        `https://tutor-tutee.shop/app/live/${response.data.roomId}`,
+        "_blank"
+      );
       if (newWindow) {
         newWindow.focus();
       } else {
